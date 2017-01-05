@@ -27,14 +27,12 @@ public class FlinkStateQueryService {
   private final JobID jobId;
 
   public FlinkStateQueryService() throws Exception {
-    this(
-        "4f2df5529aed29c68224f30c157e270f",
-        "/Users/max/github/flink/flink-dist/src/main/resources");
+    this("4f2df5529aed29c68224f30c157e270f", "src/test/resources");
   }
 
-  public FlinkStateQueryService(String jobIdHex, String flinkConfigDir) throws Exception {
+  public FlinkStateQueryService(String jobIdHex, String configDir) throws Exception {
     jobId = JobID.fromHexString(jobIdHex);
-    client = new QueryableStateClient(GlobalConfiguration.loadConfiguration(flinkConfigDir));
+    client = new QueryableStateClient(GlobalConfiguration.loadConfiguration(configDir));
   }
 
   List<KeyedDataPoint<Long>> query(String key) throws Exception {
