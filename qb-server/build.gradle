@@ -3,7 +3,14 @@ plugins {
 }
 
 dependencies {
+    configurations.all {
+        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    }
+
+    compile project(':qb-common')
     compile 'org.springframework.boot:spring-boot-starter-web'
+    compile "org.apache.flink:flink-streaming-java_2.10:$flinkVersion"
+    compile "org.apache.flink:flink-java:$flinkVersion"
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }

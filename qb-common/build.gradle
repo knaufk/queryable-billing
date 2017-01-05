@@ -1,0 +1,3 @@
+dependencies {
+    compile "org.apache.flink:flink-streaming-java_2.10:$flinkVersion"
+}

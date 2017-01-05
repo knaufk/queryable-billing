@@ -15,7 +15,7 @@ public class DataPoint<T> {
     this.value = value;
   }
 
-  long getTimeStampMs() {
+  public long getTimeStampMs() {
     return timeStampMs;
   }
 
