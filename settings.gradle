@@ -1,2 +1,3 @@
 rootProject.name = 'queryable-billing'
+include 'qb-job'
 

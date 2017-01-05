@@ -1,0 +1,9 @@
+apply plugin: 'java'
+
+dependencies {
+    compile "org.apache.flink:flink-streaming-java_2.10:$flinkVersion"
+    compile "org.apache.flink:flink-java:$flinkVersion"
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile "org.apache.flink:flink-test-utils_2.10:$flinkVersion"
+}
