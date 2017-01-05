@@ -1,0 +1,9 @@
+plugins {
+    id 'org.springframework.boot' version '1.4.3.RELEASE'
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web'
+
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+}

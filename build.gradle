@@ -1,9 +1,23 @@
-group 'com.tngtech'
-version '0.1-SNAPSHOT'
+buildscript {
+    repositories {
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+    dependencies {
+        classpath 'com.diffplug.gradle.spotless:spotless:2.4.1'
+    }
+}
 
 ext.flinkVersion = '1.3-SNAPSHOT'
 
 allprojects {
+    apply plugin: 'java'
+    apply plugin: 'com.diffplug.gradle.spotless'
+
+    group 'com.tngtech'
+    version '0.1-SNAPSHOT'
+
     repositories {
         maven {
             url {
@@ -11,5 +25,11 @@ allprojects {
             }
         }
         jcenter()
+    }
+
+    spotless {
+        java {
+            googleJavaFormat()
+        }
     }
 }
