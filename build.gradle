@@ -1,13 +1,13 @@
 group 'com.tngtech'
 version '0.1-SNAPSHOT'
 
-ext.flinkVersion = "1.3-SNAPSHOT"
+ext.flinkVersion = '1.3-SNAPSHOT'
 
 allprojects {
     repositories {
         maven {
             url {
-                "https://repository.apache.org/content/repositories/snapshots/"
+                'https://repository.apache.org/content/repositories/snapshots/'
             }
         }
         jcenter()

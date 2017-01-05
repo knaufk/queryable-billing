@@ -1,9 +1,18 @@
-apply plugin: 'java'
+plugins {
+    id 'java'
+    id 'com.diffplug.gradle.spotless' version '2.4.1'
+}
 
 dependencies {
-    compile "org.apache.flink:flink-streaming-java_2.10:$flinkVersion"
-    compile "org.apache.flink:flink-java:$flinkVersion"
+    compile group: 'org.apache.flink', name: 'flink-streaming-java_2.10', version: flinkVersion
+    compile group: 'org.apache.flink', name: 'flink-java', version: flinkVersion
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile "org.apache.flink:flink-test-utils_2.10:$flinkVersion"
+    testCompile group: 'org.apache.flink', name: 'flink-test-utils_2.10', version: flinkVersion
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+    }
 }
