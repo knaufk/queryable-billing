@@ -14,3 +14,7 @@ dependencies {
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
+
+bootRepackage {
+    mainClass = 'com.tngtech.qb.QueryableBillingServer'
+}

@@ -11,6 +11,7 @@ import org.apache.flink.runtime.query.QueryableStateClient;
 import org.apache.flink.runtime.query.netty.message.KvStateRequestSerializer;
 import org.apache.flink.runtime.state.VoidNamespace;
 import org.apache.flink.runtime.state.VoidNamespaceSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
@@ -26,13 +27,12 @@ public class FlinkStateQueryService {
 
   private final JobID jobId;
 
-  public FlinkStateQueryService() throws Exception {
-    this("4f2df5529aed29c68224f30c157e270f", "src/test/resources");
-  }
-
-  public FlinkStateQueryService(String jobIdHex, String configDir) throws Exception {
+  public FlinkStateQueryService(
+      @Value("${flink.jobIdHex}") String jobIdHex,
+      @Value("${flink.configDir}") String flinkConfigDir)
+      throws Exception {
     jobId = JobID.fromHexString(jobIdHex);
-    client = new QueryableStateClient(GlobalConfiguration.loadConfiguration(configDir));
+    client = new QueryableStateClient(GlobalConfiguration.loadConfiguration(flinkConfigDir));
   }
 
   List<KeyedDataPoint<Long>> query(String key) throws Exception {

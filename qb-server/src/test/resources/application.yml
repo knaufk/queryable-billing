@@ -1,0 +1,3 @@
+flink:
+  configDir: src/test/resources
+  jobIdHex: "4f2df5529aed29c68224f30c157e270f"

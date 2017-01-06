@@ -15,7 +15,7 @@ mvn clean package -DskipTests
 ```
 $FLINK_DIR/build-target/bin/start-local.sh
 ```
-3. Assemble flink jar (now in project dir)
+3. Assemble flink jar (now in this project's directory)
 ```
 ./gradlew qb-job:shadowJar 
 ```
@@ -23,4 +23,12 @@ $FLINK_DIR/build-target/bin/start-local.sh
 ```
 $FLINK_DIR/build-target/bin/flink run qb-job/build/libs/qb-job-0.1-SNAPSHOT-all.jar
 ```
-5. Copy job id to `FlinkStateQueryServiceManualTest` and change flink config dir to `$FLINK_DIR/flink-dist/src/main/resources`. Then run it.
+5. Build qb-server via
+```
+./gradlew qb-server:bootRepackage
+```
+6. Start via (replace job id)
+```
+java -jar qb-server/build/libs/qb-server-0.1-SNAPSHOT.jar --flink.configDir=$FLINK_DIR/flink-dist/src/main/resources --flink.jobIdHex=c9e2b987304fe3314b329fe0d17b2c8b
+```
+7. Query at <http://localhost:8080/query>
