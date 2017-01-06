@@ -28,9 +28,14 @@ allprojects {
         jcenter()
     }
 
+    dependencies {
+        compile 'com.google.guava:guava:20.0'
+    }
+
     spotless {
         java {
             googleJavaFormat()
         }
     }
 }
+

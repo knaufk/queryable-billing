@@ -1,6 +1,5 @@
 package com.tngtech.qb;
 
-import com.jgrier.flinkstuff.data.KeyedDataPoint;
 import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.typeinfo.TypeHint;
@@ -35,7 +34,7 @@ public class FlinkStateQueryService {
     client = new QueryableStateClient(GlobalConfiguration.loadConfiguration(flinkConfigDir));
   }
 
-  List<KeyedDataPoint<Long>> query(String key) throws Exception {
+  List<BillableEvent> query(String key) throws Exception {
     final Future<byte[]> stateFuture =
         client.getKvState(jobId, "time-series", key.hashCode(), serialize(key));
     final byte[] serializedResult =
@@ -50,10 +49,10 @@ public class FlinkStateQueryService {
         key, keySerializer, VoidNamespace.INSTANCE, VoidNamespaceSerializer.INSTANCE);
   }
 
-  private List<KeyedDataPoint<Long>> deserialize(byte[] serializedResult) throws IOException {
+  private List<BillableEvent> deserialize(byte[] serializedResult) throws IOException {
     return KvStateRequestSerializer.deserializeList(
         serializedResult,
-        TypeInformation.of(new TypeHint<KeyedDataPoint<Long>>() {})
+        TypeInformation.of(new TypeHint<BillableEvent>() {})
             .createSerializer(new ExecutionConfig()));
   }
 }

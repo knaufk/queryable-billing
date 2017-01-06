@@ -1,9 +1,5 @@
 package com.tngtech.qb;
 
-import com.jgrier.flinkstuff.data.KeyedDataPoint;
-
-import java.util.List;
-
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class FlinkStateQueryServiceManualTest {
@@ -15,8 +11,7 @@ public class FlinkStateQueryServiceManualTest {
             "/Users/max/github/flink/flink-dist/src/main/resources");
     while (true) {
       SECONDS.sleep(1);
-      final List<KeyedDataPoint<Long>> results = queryService.query("Anton");
-      for (KeyedDataPoint<Long> result : results) {
+      for (BillableEvent result : queryService.query("Anton")) {
         System.out.println(result);
       }
     }

@@ -1,6 +1,5 @@
 package com.tngtech.qb;
 
-import com.jgrier.flinkstuff.data.KeyedDataPoint;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.api.common.state.ListStateDescriptor;
@@ -13,19 +12,18 @@ import org.apache.flink.util.Collector;
 
 import java.util.List;
 
-public class QueryableWindow
-    extends RichFlatMapFunction<KeyedDataPoint<Long>, List<KeyedDataPoint<Long>>> {
+public class QueryableWindow extends RichFlatMapFunction<BillableEvent, List<BillableEvent>> {
   private static final String LIST_STATE_NAME = "time-series";
 
   private ValueState<Integer> countState;
 
-  private final ListStateDescriptor<KeyedDataPoint<Long>> listStateDescriptor;
-  private ListState<KeyedDataPoint<Long>> listState;
+  private final ListStateDescriptor<BillableEvent> listStateDescriptor;
+  private ListState<BillableEvent> listState;
 
   QueryableWindow() {
     listStateDescriptor =
         new ListStateDescriptor<>(
-            LIST_STATE_NAME, TypeInformation.of(new TypeHint<KeyedDataPoint<Long>>() {}));
+            LIST_STATE_NAME, TypeInformation.of(new TypeHint<BillableEvent>() {}));
     listStateDescriptor.setQueryable(LIST_STATE_NAME);
   }
 
@@ -39,8 +37,7 @@ public class QueryableWindow
   }
 
   @Override
-  public void flatMap(KeyedDataPoint<Long> value, Collector<List<KeyedDataPoint<Long>>> out)
-      throws Exception {
+  public void flatMap(BillableEvent value, Collector<List<BillableEvent>> out) throws Exception {
     int count = countState.value();
     if (count == 200) {
       listState.clear();

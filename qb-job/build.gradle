@@ -4,7 +4,6 @@ dependencies {
     compile project(':qb-common')
     compile "org.apache.flink:flink-streaming-java_2.10:$flinkVersion"
     compile "org.apache.flink:flink-java:$flinkVersion"
-    compile 'com.google.guava:guava:18.0'
 
     testCompile 'junit:junit:4.11'
     testCompile "org.apache.flink:flink-test-utils_2.10:$flinkVersion"

@@ -1,12 +1,14 @@
 package com.jgrier.flinkstuff.sources;
 
-import com.jgrier.flinkstuff.data.DataPoint;
+import com.tngtech.qb.BillableEvent;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.checkpoint.CheckpointedAsynchronously;
 import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunction;
 import org.apache.flink.streaming.api.watermark.Watermark;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 
-public class TimestampSource extends RichParallelSourceFunction<DataPoint<Long>>
+public class TimestampSource extends RichParallelSourceFunction<BillableEvent>
     implements CheckpointedAsynchronously<Long> {
   private final int periodMs;
   private final int slowdownFactor;
@@ -30,10 +32,11 @@ public class TimestampSource extends RichParallelSourceFunction<DataPoint<Long>>
   }
 
   @Override
-  public void run(SourceContext<DataPoint<Long>> ctx) throws Exception {
+  public void run(SourceContext<BillableEvent> ctx) throws Exception {
     while (running) {
       synchronized (ctx.getCheckpointLock()) {
-        ctx.collectWithTimestamp(new DataPoint<>(currentTimeMs, 0L), currentTimeMs);
+        ctx.collectWithTimestamp(
+            new BillableEvent(currentTimeMs, "", Money.of(CurrencyUnit.EUR, 0)), currentTimeMs);
         ctx.emitWatermark(new Watermark(currentTimeMs));
         currentTimeMs += periodMs;
       }

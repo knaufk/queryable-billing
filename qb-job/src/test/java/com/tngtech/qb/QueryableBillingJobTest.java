@@ -1,6 +1,5 @@
 package com.tngtech.qb;
 
-import com.jgrier.flinkstuff.data.DataPoint;
 import org.apache.flink.streaming.util.StreamingMultipleProgramsTestBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,9 +22,9 @@ public class QueryableBillingJobTest extends StreamingMultipleProgramsTestBase {
     job.run();
   }
 
-  private Collection<DataPoint<Long>> createTestData() {
+  private Collection<BillableEvent> createTestData() {
     return LongStream.range(1, 1000)
-        .mapToObj(i -> new DataPoint<Long>().withNewValue(i))
+        .mapToObj(i -> new BillableEvent().withNewAmount(i))
         .collect(Collectors.toList());
   }
 }
