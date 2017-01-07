@@ -15,7 +15,7 @@ public class BillableEvent {
   public BillableEvent() {
     this.timestampMs = 0;
     this.customer = "";
-    this.amount = Money.of(CurrencyUnit.EUR, 0);
+    this.amount = Money.zero(CurrencyUnit.EUR);
   }
 
   public BillableEvent(long timestampMs, String customer, Money amount) {

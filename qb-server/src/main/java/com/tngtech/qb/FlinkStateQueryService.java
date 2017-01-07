@@ -17,13 +17,11 @@ import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class FlinkStateQueryService {
   private final QueryableStateClient client;
-
   private final JobID jobId;
 
   public FlinkStateQueryService(
@@ -34,9 +32,9 @@ public class FlinkStateQueryService {
     client = new QueryableStateClient(GlobalConfiguration.loadConfiguration(flinkConfigDir));
   }
 
-  List<BillableEvent> query(String key) throws Exception {
+  BillableEvent query(String key) throws Exception {
     final Future<byte[]> stateFuture =
-        client.getKvState(jobId, "time-series", key.hashCode(), serialize(key));
+        client.getKvState(jobId, Constants.STATE_NAME, key.hashCode(), serialize(key));
     final byte[] serializedResult =
         Await.result(stateFuture, new FiniteDuration(10, TimeUnit.SECONDS));
     return deserialize(serializedResult);
@@ -49,8 +47,8 @@ public class FlinkStateQueryService {
         key, keySerializer, VoidNamespace.INSTANCE, VoidNamespaceSerializer.INSTANCE);
   }
 
-  private List<BillableEvent> deserialize(byte[] serializedResult) throws IOException {
-    return KvStateRequestSerializer.deserializeList(
+  private BillableEvent deserialize(byte[] serializedResult) throws IOException {
+    return KvStateRequestSerializer.deserializeValue(
         serializedResult,
         TypeInformation.of(new TypeHint<BillableEvent>() {})
             .createSerializer(new ExecutionConfig()));

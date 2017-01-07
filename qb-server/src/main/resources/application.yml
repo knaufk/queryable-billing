@@ -1,0 +1,1 @@
+logging.level.org.apache.flink.api.java.typeutils.TypeExtractor: WARN
