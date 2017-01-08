@@ -21,7 +21,7 @@ public class QueryableStateController {
   public @ResponseBody String query(
       @RequestParam(value = "customer", required = false, defaultValue = "Anton") String customer) {
     try {
-      return queryService.query(customer).toString();
+      return queryService.findOne(customer).toString();
     } catch (Exception e) {
       throw new QueryNotPossibleException(customer);
     }

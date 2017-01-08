@@ -4,10 +4,19 @@ public class FlinkStateQueryServiceManualTest {
   public static void main(String[] args) throws Exception {
     final FlinkStateQueryService queryService =
         new FlinkStateQueryService(
-            "b7d654e6fe66965266aac33ec10d421d",
+            "af86615d542185e90a2dce80ae1e521f",
             "/Users/max/github/flink/flink-dist/src/main/resources");
     while (true) {
-      System.err.println(queryService.query("Anton"));
+      queryService
+          .findAllCustomers()
+          .forEach(
+              c -> {
+                try {
+                  System.out.println(queryService.findOne(c));
+                } catch (Exception e) {
+                  e.printStackTrace();
+                }
+              });
     }
   }
 }

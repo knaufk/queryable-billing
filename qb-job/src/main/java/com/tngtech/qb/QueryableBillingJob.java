@@ -6,6 +6,7 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.FoldFunction;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
@@ -85,5 +86,9 @@ class QueryableBillingJob {
                 TypeInformation.of(new TypeHint<BillableEvent>() {}));
 
     summedPreviews.keyBy("customer").flatMap(new EndpointForQueries());
+
+    billableEvents
+        .keyBy((KeySelector<BillableEvent, Integer>) value -> Constants.CUSTOMERS_KEY)
+        .flatMap(new EndpointForCustomerQueries());
   }
 }

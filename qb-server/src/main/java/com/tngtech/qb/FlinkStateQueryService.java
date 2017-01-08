@@ -17,6 +17,7 @@ import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -32,12 +33,25 @@ public class FlinkStateQueryService {
     client = new QueryableStateClient(GlobalConfiguration.loadConfiguration(flinkConfigDir));
   }
 
-  BillableEvent query(String key) throws Exception {
+  BillableEvent findOne(String customer) throws Exception {
     final Future<byte[]> stateFuture =
-        client.getKvState(jobId, Constants.LATEST_EVENT_STATE_NAME, key.hashCode(), serialize(key));
+        client.getKvState(
+            jobId, Constants.LATEST_EVENT_STATE_NAME, customer.hashCode(), serialize(customer));
     final byte[] serializedResult =
         Await.result(stateFuture, new FiniteDuration(10, TimeUnit.SECONDS));
     return deserialize(serializedResult);
+  }
+
+  Set<String> findAllCustomers() throws Exception {
+    final Future<byte[]> stateFuture =
+        client.getKvState(
+            jobId,
+            Constants.CUSTOMERS_STATE_NAME,
+            Constants.CUSTOMERS_KEY.hashCode(),
+            serialize(Constants.CUSTOMERS_KEY));
+    final byte[] serializedResult =
+        Await.result(stateFuture, new FiniteDuration(10, TimeUnit.SECONDS));
+    return deserializeSet(serializedResult);
   }
 
   private byte[] serialize(String key) throws IOException {
@@ -47,10 +61,23 @@ public class FlinkStateQueryService {
         key, keySerializer, VoidNamespace.INSTANCE, VoidNamespaceSerializer.INSTANCE);
   }
 
+  private byte[] serialize(Integer key) throws IOException {
+    TypeSerializer<Integer> keySerializer =
+        TypeInformation.of(new TypeHint<Integer>() {}).createSerializer(null);
+    return KvStateRequestSerializer.serializeKeyAndNamespace(
+        key, keySerializer, VoidNamespace.INSTANCE, VoidNamespaceSerializer.INSTANCE);
+  }
+
   private BillableEvent deserialize(byte[] serializedResult) throws IOException {
     return KvStateRequestSerializer.deserializeValue(
         serializedResult,
         TypeInformation.of(new TypeHint<BillableEvent>() {})
             .createSerializer(new ExecutionConfig()));
+  }
+
+  private Set<String> deserializeSet(byte[] serializedResult) throws IOException {
+    return KvStateRequestSerializer.deserializeValue(
+        serializedResult,
+        TypeInformation.of(new TypeHint<Set<String>>() {}).createSerializer(new ExecutionConfig()));
   }
 }

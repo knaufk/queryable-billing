@@ -6,9 +6,7 @@ import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 
-import java.util.List;
-
-public class EndpointForQueries extends RichFlatMapFunction<BillableEvent, List<BillableEvent>> {
+public class EndpointForQueries extends RichFlatMapFunction<BillableEvent, Object> {
   private final ValueStateDescriptor<BillableEvent> stateDescriptor =
       new ValueStateDescriptor<>(
           Constants.LATEST_EVENT_STATE_NAME, BillableEvent.class, BillableEvent.empty());
@@ -22,7 +20,7 @@ public class EndpointForQueries extends RichFlatMapFunction<BillableEvent, List<
   }
 
   @Override
-  public void flatMap(BillableEvent value, Collector<List<BillableEvent>> out) throws Exception {
+  public void flatMap(BillableEvent value, Collector<Object> out) throws Exception {
     state.update(value);
   }
 }
