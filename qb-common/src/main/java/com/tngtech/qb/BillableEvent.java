@@ -33,6 +33,10 @@ public class BillableEvent {
     return new BillableEvent(timestampMs, newCustomer, amount);
   }
 
+  static BillableEvent empty() {
+    return new BillableEvent(System.currentTimeMillis(), "", Money.of(CurrencyUnit.EUR, 0));
+  }
+
   public long getTimestampMs() {
     return timestampMs;
   }

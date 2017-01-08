@@ -34,7 +34,7 @@ public class FlinkStateQueryService {
 
   BillableEvent query(String key) throws Exception {
     final Future<byte[]> stateFuture =
-        client.getKvState(jobId, Constants.STATE_NAME, key.hashCode(), serialize(key));
+        client.getKvState(jobId, Constants.LATEST_EVENT_STATE_NAME, key.hashCode(), serialize(key));
     final byte[] serializedResult =
         Await.result(stateFuture, new FiniteDuration(10, TimeUnit.SECONDS));
     return deserialize(serializedResult);
