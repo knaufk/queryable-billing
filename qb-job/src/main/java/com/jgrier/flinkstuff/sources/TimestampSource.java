@@ -65,7 +65,7 @@ public class TimestampSource extends RichParallelSourceFunction<BillableEvent>
     long sleepTime = periodMs + realTimeDeltaMs + randomJitter();
 
     if (slowdownFactor != 1) {
-      sleepTime = periodMs * slowdownFactor;
+      sleepTime = (long) periodMs * slowdownFactor;
     }
 
     if (sleepTime > 0) {

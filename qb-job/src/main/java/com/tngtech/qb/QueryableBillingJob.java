@@ -24,8 +24,6 @@ import org.apache.flink.util.Collector;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
-import java.util.Random;
-
 class QueryableBillingJob {
   @VisibleForTesting
   final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -60,7 +58,7 @@ class QueryableBillingJob {
   }
 
   private static double nextRandomAmount() {
-    return new Random().nextDouble() * 100;
+    return Math.random() * 100;
   }
 
   private void invoice(SingleOutputStreamOperator<BillableEvent> billableEvents) {
