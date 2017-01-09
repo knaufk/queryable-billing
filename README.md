@@ -40,3 +40,11 @@ What's next
 - [ ] improve REST interface, maybe using [Spring Data REST](http://docs.spring.io/spring-data/rest/docs/current/reference/html/)
 - [ ] `TimestampSource` &rarr; Kafka source and Kafka test data generator
 - [ ] Get job id from flink instead of having to provide it at startup time
+- [ ] Output, i.e. bill creation (FileSink? maybe HDFS for exactly-once)
+- [ ] Expose metrics in job (for Flink Web UI or Grafana?)
+- [ ] Front end for queries, e.g. [HAL Browser](http://docs.spring.io/spring-data/rest/docs/current/reference/html/#_the_hal_browser)
+- [ ] investigate [simple-json-datasource](https://github.com/grafana/simple-json-datasource) Grafana plugin
+- [ ] create infrastructure for distributed tests (e.g. YARN via docker or vagrant, ...)
+- [ ] Checkpointing, test task manager failures
+- [ ] JM HA, test job manager failures
+- [ ] think about implications of event time
