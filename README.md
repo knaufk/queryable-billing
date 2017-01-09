@@ -32,3 +32,11 @@ $FLINK_DIR/build-target/bin/flink run qb-job/build/libs/qb-job-0.1-SNAPSHOT-all.
 java -jar qb-server/build/libs/qb-server-0.1-SNAPSHOT.jar --flink.configDir=$FLINK_DIR/flink-dist/src/main/resources --flink.jobIdHex=c9e2b987304fe3314b329fe0d17b2c8b
 ```
 7. Query at <http://localhost:8080/query>
+
+For faster feedback cycles have a look at `FlinkStateQueryServiceManualTest`
+
+What's next
+-----------
+- [ ] improve REST interface, maybe using [Spring Data REST](http://docs.spring.io/spring-data/rest/docs/current/reference/html/)
+- [ ] `TimestampSource` &rarr; Kafka source and Kafka test data generator
+- [ ] Get job id from flink instead of having to provide it at startup time
