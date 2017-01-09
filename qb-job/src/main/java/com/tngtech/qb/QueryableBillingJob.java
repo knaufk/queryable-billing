@@ -24,12 +24,16 @@ import org.apache.flink.util.Collector;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
-class QueryableBillingJob {
+public class QueryableBillingJob {
   @VisibleForTesting
   final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-  QueryableBillingJob() {
+  private QueryableBillingJob() {
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+  }
+
+  public static void main(String[] args) throws Exception {
+    new QueryableBillingJob().run();
   }
 
   void run() throws Exception {
