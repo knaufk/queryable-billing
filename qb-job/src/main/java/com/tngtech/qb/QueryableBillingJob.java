@@ -9,18 +9,19 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.sink.DiscardingSink;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.triggers.CountTrigger;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.streaming.connectors.fs.bucketing.BucketingSink;
 import org.apache.flink.util.Collector;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -29,12 +30,16 @@ public class QueryableBillingJob {
   @VisibleForTesting
   final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-  private QueryableBillingJob() {
+  private final ParameterTool parameters;
+
+  QueryableBillingJob(ParameterTool parameters) {
+    this.parameters = parameters;
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
   }
 
   public static void main(String[] args) throws Exception {
-    new QueryableBillingJob().run();
+    ParameterTool parameters = ParameterTool.fromArgs(args);
+    new QueryableBillingJob(parameters).run();
   }
 
   void run() throws Exception {
@@ -66,11 +71,13 @@ public class QueryableBillingJob {
   private void invoice(SingleOutputStreamOperator<BillableEvent> billableEvents) {
     makeCustomersQueryable(billableEvents);
 
-    final WindowedStream<BillableEvent, Tuple, TimeWindow> windowed =
-        billableEvents.keyBy("customer").window(TumblingEventTimeWindows.of(Time.seconds(10)));
+    sumQueryablePreviews(window(billableEvents));
+    outputFinalInvoice(window(billableEvents));
+  }
 
-    sumQueryablePreviews(windowed);
-    outputFinalInvoice(windowed);
+  private WindowedStream<BillableEvent, Tuple, TimeWindow> window(
+      SingleOutputStreamOperator<BillableEvent> billableEvents) {
+    return billableEvents.keyBy("customer").window(TumblingEventTimeWindows.of(Time.seconds(10)));
   }
 
   private SingleOutputStreamOperator<Object> makeCustomersQueryable(
@@ -93,7 +100,12 @@ public class QueryableBillingJob {
   }
 
   private void outputFinalInvoice(WindowedStream<BillableEvent, Tuple, TimeWindow> windowed) {
-    tallyUp(windowed).addSink(new DiscardingSink<>()).name("Create Final Invoices");
+    tallyUp(windowed)
+        .addSink(
+            new BucketingSink<BillableEvent>(parameters.getRequired("output"))
+                .setInactiveBucketCheckInterval(10)
+                .setInactiveBucketThreshold(10))
+        .name("Create Final Invoices");
   }
 
   private SingleOutputStreamOperator<BillableEvent> tallyUp(
