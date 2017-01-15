@@ -30,7 +30,7 @@ class QueryableBillingJobSpec extends Specification {
     def setup() {
         env = StreamExecutionEnvironment.getExecutionEnvironment()
         job = Spy(QueryableBillingJob, constructorArgs: [this.env, ParameterTool.fromMap(ImmutableMap.of("output", temporaryFolder.getRoot().getPath()))]) {
-            getSource() >> createTestSource()
+            billableEvents() >> createTestSource()
         }
     }
 
@@ -44,6 +44,8 @@ class QueryableBillingJobSpec extends Specification {
                 outputLines.addAll(file.readLines())
             }
         }
+
+        print(outputLines)
 
         then:
         assertThat(outputLines, anyOf(hasSize(3), hasSize(6)))
@@ -65,7 +67,7 @@ class QueryableBillingJobSpec extends Specification {
     private SingleOutputStreamOperator<BillableEvent> createTestSource() {
         env.fromCollection(
                 LongStream.range(1, 1000)
-                        .collect({ new BillableEvent().withNewAmount(it) }))
+                        .collect({ new BillableEvent().setEuroAmount(it) }))
                 .assignTimestampsAndWatermarks(
                 new TestTimestampAssigner(Time.seconds(1)))
     }

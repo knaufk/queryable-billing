@@ -1,3 +1,4 @@
 dependencies {
     compile 'org.joda:joda-money:0.12'
+    compile 'org.ajbrown:NameMachine:0.1.1'
 }

@@ -9,7 +9,7 @@ Manual Testing
 --------------
 1. Check out [Apache Flink](https://github.com/apache/flink)'s master branch and build using maven, i.e. go to flink repo (from now on $FLINK_DIR) and
 ```
-mvn clean package -DskipTests
+mvn clean install -DskipTests
 ```
 2. Start local flink
 ```
@@ -21,7 +21,7 @@ $FLINK_DIR/build-target/bin/start-local.sh
 ```
 4. Submit jar
 ```
-$FLINK_DIR/build-target/bin/flink run qb-job/build/libs/qb-job-0.1-SNAPSHOT-all.jar
+$FLINK_DIR/build-target/bin/flink run -d qb-job/build/libs/qb-job-0.1-SNAPSHOT-all.jar --output /tmp
 ```
 5. Build qb-server via
 ```
@@ -38,12 +38,14 @@ For faster feedback cycles have a look at `FlinkStateQueryServiceManualTest`
 What's next
 -----------
 - [x] Output, i.e. bill creation (FileSink? maybe HDFS for exactly-once)
-- [ ] **KKn** refine data structure & cleanup job 
-- [ ] `TimestampSource` &rarr; Kafka source and Kafka test data generator
+- [x] **KKn** refine data structure & cleanup job 
+- [x] `TimestampSource` &rarr; SimpleBillableEventSource
+- [ ] `SimpleBillableEventSoure` &rarr; Kafka source and Kafka test data generator
+- [x] add handling for late-arriving events
 - [ ] add event-time handling (including late-arriving events)
 - [ ] **KKn** Front end for queries (as a customer), e.g. [HAL Browser](http://docs.spring.io/spring-data/rest/docs/current/reference/html/#_the_hal_browser) or better: reactive app
 - [ ] investigate [simple-json-datasource](https://github.com/grafana/simple-json-datasource) Grafana plugin for management dashboard
-- [ ] investigate Splunk REST query for management dashboard
+- [x] investigate Splunk REST query for management dashboard -> Should work (Check: http://blogs.splunk.com/2013/06/18/getting-data-from-your-rest-apis-into-splunk/)
 - [ ] **MB** create infrastructure for distributed tests (e.g. YARN via docker or vagrant, ...)
 - [ ] Checkpointing, test task manager failures
 - [ ] JM HA, test job manager failures

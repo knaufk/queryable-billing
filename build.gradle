@@ -22,6 +22,7 @@ allprojects {
     version '0.1-SNAPSHOT'
 
     repositories {
+        mavenLocal()
         maven {
             url {
                 'https://repository.apache.org/content/repositories/snapshots/'

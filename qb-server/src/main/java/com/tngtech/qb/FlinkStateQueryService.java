@@ -33,7 +33,7 @@ public class FlinkStateQueryService {
     client = new QueryableStateClient(GlobalConfiguration.loadConfiguration(flinkConfigDir));
   }
 
-  BillableEvent findOne(String customer) throws Exception {
+  MonthlyTotal findOne(String customer) throws Exception {
     final Future<byte[]> stateFuture =
         client.getKvState(
             jobId, Constants.LATEST_EVENT_STATE_NAME, customer.hashCode(), serialize(customer));
@@ -68,10 +68,10 @@ public class FlinkStateQueryService {
         key, keySerializer, VoidNamespace.INSTANCE, VoidNamespaceSerializer.INSTANCE);
   }
 
-  private BillableEvent deserialize(byte[] serializedResult) throws IOException {
+  private MonthlyTotal deserialize(byte[] serializedResult) throws IOException {
     return KvStateRequestSerializer.deserializeValue(
         serializedResult,
-        TypeInformation.of(new TypeHint<BillableEvent>() {})
+        TypeInformation.of(new TypeHint<MonthlyTotal>() {})
             .createSerializer(new ExecutionConfig()));
   }
 
