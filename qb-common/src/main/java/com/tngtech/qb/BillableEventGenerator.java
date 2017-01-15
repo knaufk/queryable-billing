@@ -54,7 +54,7 @@ public class BillableEventGenerator {
   private String nextCustomer() {
     Name customer = customers.get(rnd.nextInt(NO_OF_CUSTOMERS));
 
-    return customer.getFirstName() + " " + customer.getLastName();
+    return customer.getFirstName();
   }
 
   private long nextTimestamp() {

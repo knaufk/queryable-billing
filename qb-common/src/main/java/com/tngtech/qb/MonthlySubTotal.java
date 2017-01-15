@@ -1,28 +1,27 @@
 package com.tngtech.qb;
 
-import com.google.common.base.MoreObjects;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
 import java.util.Objects;
 
-public class MonthlyTotal {
+public class MonthlySubTotal<T> {
 
-  private final String customer;
+  private final T customer;
   private final String month;
   private final Money total;
 
-  public MonthlyTotal empty() {
-    return new MonthlyTotal("", "", Money.zero(CurrencyUnit.EUR));
+  public MonthlySubTotal empty() {
+    return new MonthlySubTotal("", "", Money.zero(CurrencyUnit.EUR));
   }
 
-  public MonthlyTotal(final String customer, String month, final Money total) {
+  public MonthlySubTotal(final T customer, String month, final Money total) {
     this.customer = customer;
     this.month = month;
     this.total = total;
   }
 
-  public String getCustomer() {
+  public T getCustomer() {
     return customer;
   }
 
@@ -53,7 +52,7 @@ public class MonthlyTotal {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    final MonthlyTotal that = (MonthlyTotal) o;
+    final MonthlySubTotal that = (MonthlySubTotal) o;
     return Objects.equals(customer, that.customer)
         && Objects.equals(month, that.month)
         && Objects.equals(total, that.total);

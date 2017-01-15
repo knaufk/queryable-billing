@@ -42,33 +42,20 @@ public class BillableEvent {
     return new BillableEvent(timestampMs, newCustomer, amount, type);
   }
 
-  static BillableEvent empty() {
-    return new BillableEvent(
-        System.currentTimeMillis(), "", Money.of(CurrencyUnit.EUR, 0), BillableEventType.MISC);
+  public BillableEventType getType() {
+    return type;
   }
 
   public long getTimestampMs() {
     return timestampMs;
   }
 
-  public void setTimestampMs(long timestampMs) {
-    this.timestampMs = timestampMs;
-  }
-
   public String getCustomer() {
     return customer;
   }
 
-  public void setCustomer(String customer) {
-    this.customer = customer;
-  }
-
   public Money getAmount() {
     return amount;
-  }
-
-  public void setAmount(Money amount) {
-    this.amount = amount;
   }
 
   @Override

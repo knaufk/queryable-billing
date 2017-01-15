@@ -1,5 +1,6 @@
 package com.tngtech.qb;
 
+import com.tngtech.qb.BillableEvent.BillableEventType;
 import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.typeinfo.TypeHint;
@@ -17,7 +18,6 @@ import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.io.IOException;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -33,26 +33,49 @@ public class FlinkStateQueryService {
     client = new QueryableStateClient(GlobalConfiguration.loadConfiguration(flinkConfigDir));
   }
 
-  MonthlyTotal findOne(String customer) throws Exception {
+  MonthlyCustomerSubTotal findOne(String customer) throws Exception {
     final Future<byte[]> stateFuture =
         client.getKvState(
-            jobId, Constants.LATEST_EVENT_STATE_NAME, customer.hashCode(), serialize(customer));
+            jobId, Constants.PER_CUSTOMER_STATE_NAME, customer.hashCode(), serializeCustomer(customer));
     final byte[] serializedResult =
         Await.result(stateFuture, new FiniteDuration(10, TimeUnit.SECONDS));
-    return deserialize(serializedResult);
+    return deserializeCustomer(serializedResult);
   }
 
-  private byte[] serialize(String key) throws IOException {
+  public MonthlyEventTypeSubTotal findOne(final BillableEventType type) throws Exception {
+    final Future<byte[]> stateFuture =
+            client.getKvState(
+                    jobId, Constants.PER_EVENT_TYPE_STATE_NAME, type.hashCode(), serializeEventType(type));
+    final byte[] serializedResult =
+            Await.result(stateFuture, new FiniteDuration(10, TimeUnit.SECONDS));
+    return deserializeEventType(serializedResult);
+  }
+
+  private byte[] serializeCustomer(String key) throws IOException {
     TypeSerializer<String> keySerializer =
         TypeInformation.of(new TypeHint<String>() {}).createSerializer(null);
     return KvStateRequestSerializer.serializeKeyAndNamespace(
         key, keySerializer, VoidNamespace.INSTANCE, VoidNamespaceSerializer.INSTANCE);
   }
 
-  private MonthlyTotal deserialize(byte[] serializedResult) throws IOException {
+  private byte[] serializeEventType(final BillableEventType type) throws IOException {
+    TypeSerializer<BillableEventType> keySerializer =
+            TypeInformation.of(new TypeHint<BillableEventType>() {}).createSerializer(null);
+    return KvStateRequestSerializer.serializeKeyAndNamespace(
+            type, keySerializer, VoidNamespace.INSTANCE, VoidNamespaceSerializer.INSTANCE);
+  }
+
+  private MonthlyCustomerSubTotal deserializeCustomer(byte[] serializedResult) throws IOException {
     return KvStateRequestSerializer.deserializeValue(
         serializedResult,
-        TypeInformation.of(new TypeHint<MonthlyTotal>() {})
+        TypeInformation.of(new TypeHint<MonthlyCustomerSubTotal>() {})
             .createSerializer(new ExecutionConfig()));
+  }
+
+  private MonthlyEventTypeSubTotal deserializeEventType(byte[] serializedResult) throws IOException {
+    return KvStateRequestSerializer.deserializeValue(
+            serializedResult,
+            TypeInformation.of(new TypeHint<MonthlyEventTypeSubTotal>() {})
+                           .createSerializer(new ExecutionConfig()));
   }
 }
