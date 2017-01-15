@@ -40,6 +40,7 @@ public class QueryableBillingJob {
   }
 
   void run() throws Exception {
+    billableEvents().print();
     process(billableEvents());
     env.execute("Queryable Billing Job");
   }

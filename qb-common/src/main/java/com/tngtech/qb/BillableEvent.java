@@ -33,7 +33,7 @@ public class BillableEvent {
     this.type = type;
   }
 
-  BillableEvent setEuroAmount(double amountInEuro) {
+  BillableEvent withEuroAmount(double amountInEuro) {
     return new BillableEvent(
         timestampMs, customer, Money.of(CurrencyUnit.EUR, amountInEuro, RoundingMode.UP), type);
   }

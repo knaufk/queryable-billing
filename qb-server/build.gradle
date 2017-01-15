@@ -10,7 +10,8 @@ dependencies {
     compile project(':qb-common')
     compile('org.springframework.boot:spring-boot-starter-web',
             "org.apache.flink:flink-streaming-java_2.10:$flinkVersion",
-            "org.apache.flink:flink-java:$flinkVersion")
+            "org.apache.flink:flink-java:$flinkVersion",
+            "org.springframework.boot:spring-boot-starter-data-rest")
 
     testCompile('org.springframework.boot:spring-boot-starter-test',
             'org.spockframework:spock-spring:1.0-groovy-2.4')

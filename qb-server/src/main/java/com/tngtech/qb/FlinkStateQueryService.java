@@ -42,28 +42,9 @@ public class FlinkStateQueryService {
     return deserialize(serializedResult);
   }
 
-  Set<String> findAllCustomers() throws Exception {
-    final Future<byte[]> stateFuture =
-        client.getKvState(
-            jobId,
-            Constants.CUSTOMERS_STATE_NAME,
-            Constants.CUSTOMERS_KEY.hashCode(),
-            serialize(Constants.CUSTOMERS_KEY));
-    final byte[] serializedResult =
-        Await.result(stateFuture, new FiniteDuration(10, TimeUnit.SECONDS));
-    return deserializeSet(serializedResult);
-  }
-
   private byte[] serialize(String key) throws IOException {
     TypeSerializer<String> keySerializer =
         TypeInformation.of(new TypeHint<String>() {}).createSerializer(null);
-    return KvStateRequestSerializer.serializeKeyAndNamespace(
-        key, keySerializer, VoidNamespace.INSTANCE, VoidNamespaceSerializer.INSTANCE);
-  }
-
-  private byte[] serialize(Integer key) throws IOException {
-    TypeSerializer<Integer> keySerializer =
-        TypeInformation.of(new TypeHint<Integer>() {}).createSerializer(null);
     return KvStateRequestSerializer.serializeKeyAndNamespace(
         key, keySerializer, VoidNamespace.INSTANCE, VoidNamespaceSerializer.INSTANCE);
   }
@@ -73,11 +54,5 @@ public class FlinkStateQueryService {
         serializedResult,
         TypeInformation.of(new TypeHint<MonthlyTotal>() {})
             .createSerializer(new ExecutionConfig()));
-  }
-
-  private Set<String> deserializeSet(byte[] serializedResult) throws IOException {
-    return KvStateRequestSerializer.deserializeValue(
-        serializedResult,
-        TypeInformation.of(new TypeHint<Set<String>>() {}).createSerializer(new ExecutionConfig()));
   }
 }

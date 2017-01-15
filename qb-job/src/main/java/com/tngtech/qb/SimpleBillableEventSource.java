@@ -5,11 +5,14 @@ import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunctio
 import org.apache.flink.streaming.api.watermark.Watermark;
 
 public class SimpleBillableEventSource extends RichParallelSourceFunction<BillableEvent> {
+
+  private static final long serialVersionUID = -2075302329383160475L;
+
   private volatile boolean running = true;
 
   // Checkpointed State
   private volatile long currentTimeMs = 0;
-  private BillableEventGenerator generator;
+  private transient BillableEventGenerator generator;
 
   @Override
   public void open(Configuration parameters) throws Exception {

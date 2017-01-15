@@ -65,9 +65,10 @@ class QueryableBillingJobSpec extends Specification {
     }
 
     private SingleOutputStreamOperator<BillableEvent> createTestSource() {
+        def random = new Random();
         env.fromCollection(
                 LongStream.range(1, 1000)
-                        .collect({ new BillableEvent().setEuroAmount(it) }))
+                        .collect({ new BillableEvent().withEuroAmount(it).withCustomer(["Anton", "Berta", "Charlie"].get(random.nextInt(3))) }))
                 .assignTimestampsAndWatermarks(
                 new TestTimestampAssigner(Time.seconds(1)))
     }
