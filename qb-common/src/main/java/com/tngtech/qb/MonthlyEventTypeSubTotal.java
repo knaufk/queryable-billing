@@ -7,7 +7,8 @@ import javax.swing.event.DocumentEvent;
 
 public class MonthlyEventTypeSubTotal extends MonthlySubTotal<BillableEventType> {
 
-  public MonthlyEventTypeSubTotal(final BillableEventType type, final String month, final Money total) {
+  public MonthlyEventTypeSubTotal(
+      final BillableEventType type, final String month, final Money total) {
     super(type, month, total);
   }
 }

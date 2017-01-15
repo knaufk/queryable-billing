@@ -29,15 +29,13 @@ public class QueryableStateController {
     }
   }
 
-  @RequestMapping(path = "/types/{type}", method= RequestMethod.GET)
+  @RequestMapping(path = "/types/{type}", method = RequestMethod.GET)
   public MonthlyEventTypeSubTotal queryByType(@PathVariable String type) {
     try {
       return queryService.findOne(BillableEvent.BillableEventType.valueOf(type.toUpperCase()));
     } catch (Exception e) {
-    LOGGER.error("Error querying type", e);
+      LOGGER.error("Error querying type", e);
       throw new QueryNotPossibleException(type);
     }
   }
-
-
 }

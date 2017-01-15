@@ -36,7 +36,10 @@ public class FlinkStateQueryService {
   MonthlyCustomerSubTotal findOne(String customer) throws Exception {
     final Future<byte[]> stateFuture =
         client.getKvState(
-            jobId, Constants.PER_CUSTOMER_STATE_NAME, customer.hashCode(), serializeCustomer(customer));
+            jobId,
+            Constants.PER_CUSTOMER_STATE_NAME,
+            customer.hashCode(),
+            serializeCustomer(customer));
     final byte[] serializedResult =
         Await.result(stateFuture, new FiniteDuration(10, TimeUnit.SECONDS));
     return deserializeCustomer(serializedResult);
@@ -44,10 +47,10 @@ public class FlinkStateQueryService {
 
   public MonthlyEventTypeSubTotal findOne(final BillableEventType type) throws Exception {
     final Future<byte[]> stateFuture =
-            client.getKvState(
-                    jobId, Constants.PER_EVENT_TYPE_STATE_NAME, type.hashCode(), serializeEventType(type));
+        client.getKvState(
+            jobId, Constants.PER_EVENT_TYPE_STATE_NAME, type.hashCode(), serializeEventType(type));
     final byte[] serializedResult =
-            Await.result(stateFuture, new FiniteDuration(10, TimeUnit.SECONDS));
+        Await.result(stateFuture, new FiniteDuration(10, TimeUnit.SECONDS));
     return deserializeEventType(serializedResult);
   }
 
@@ -60,9 +63,9 @@ public class FlinkStateQueryService {
 
   private byte[] serializeEventType(final BillableEventType type) throws IOException {
     TypeSerializer<BillableEventType> keySerializer =
-            TypeInformation.of(new TypeHint<BillableEventType>() {}).createSerializer(null);
+        TypeInformation.of(new TypeHint<BillableEventType>() {}).createSerializer(null);
     return KvStateRequestSerializer.serializeKeyAndNamespace(
-            type, keySerializer, VoidNamespace.INSTANCE, VoidNamespaceSerializer.INSTANCE);
+        type, keySerializer, VoidNamespace.INSTANCE, VoidNamespaceSerializer.INSTANCE);
   }
 
   private MonthlyCustomerSubTotal deserializeCustomer(byte[] serializedResult) throws IOException {
@@ -72,10 +75,11 @@ public class FlinkStateQueryService {
             .createSerializer(new ExecutionConfig()));
   }
 
-  private MonthlyEventTypeSubTotal deserializeEventType(byte[] serializedResult) throws IOException {
+  private MonthlyEventTypeSubTotal deserializeEventType(byte[] serializedResult)
+      throws IOException {
     return KvStateRequestSerializer.deserializeValue(
-            serializedResult,
-            TypeInformation.of(new TypeHint<MonthlyEventTypeSubTotal>() {})
-                           .createSerializer(new ExecutionConfig()));
+        serializedResult,
+        TypeInformation.of(new TypeHint<MonthlyEventTypeSubTotal>() {})
+            .createSerializer(new ExecutionConfig()));
   }
 }

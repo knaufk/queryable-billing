@@ -57,9 +57,11 @@ public class QueryableBillingJob {
 
   private void process(DataStream<BillableEvent> billableEvents) {
 
-    WindowedStream<BillableEvent, String, TimeWindow> perCustomerWindows = windowByCustomer(billableEvents);
+    WindowedStream<BillableEvent, String, TimeWindow> perCustomerWindows =
+        windowByCustomer(billableEvents);
 
-    WindowedStream<BillableEvent, BillableEventType, TimeWindow> perEventTypeWindows = windowByType(billableEvents);
+    WindowedStream<BillableEvent, BillableEventType, TimeWindow> perEventTypeWindows =
+        windowByType(billableEvents);
 
     exposeQueryableTypePreviews(perEventTypeWindows);
 
@@ -67,13 +69,12 @@ public class QueryableBillingJob {
     outputFinalInvoice(perCustomerWindows);
   }
 
-
-
-  private WindowedStream<BillableEvent,BillableEventType,TimeWindow> windowByType(final DataStream<BillableEvent> billableEvents) {
+  private WindowedStream<BillableEvent, BillableEventType, TimeWindow> windowByType(
+      final DataStream<BillableEvent> billableEvents) {
     return billableEvents
-            .keyBy((KeySelector<BillableEvent, BillableEventType>) value -> value.getType())
-            .window(TumblingEventTimeWindows.of(ONE_MONTH))
-            .allowedLateness(Time.of(2, TimeUnit.SECONDS));
+        .keyBy((KeySelector<BillableEvent, BillableEventType>) value -> value.getType())
+        .window(TumblingEventTimeWindows.of(ONE_MONTH))
+        .allowedLateness(Time.of(2, TimeUnit.SECONDS));
   }
 
   private WindowedStream<BillableEvent, String, TimeWindow> windowByCustomer(
@@ -84,19 +85,22 @@ public class QueryableBillingJob {
         .allowedLateness(Time.of(2, TimeUnit.SECONDS));
   }
 
-  private void exposeQueryableCustomerPreviews(WindowedStream<BillableEvent, String, TimeWindow> windowed) {
+  private void exposeQueryableCustomerPreviews(
+      WindowedStream<BillableEvent, String, TimeWindow> windowed) {
     final WindowedStream<BillableEvent, String, TimeWindow> eventsSoFar =
         windowed.trigger(CountTrigger.of(1));
     sumUp(eventsSoFar, Constants.PER_CUSTOMER_STATE_NAME);
   }
 
-  private void exposeQueryableTypePreviews(final WindowedStream<BillableEvent, BillableEventType, TimeWindow> windowed) {
-    windowed.trigger(CountTrigger.of(1))
-            .fold(
-                    Money.zero(CurrencyUnit.EUR),
-                    (accumulator, value) -> accumulator.plus(value.getAmount()),
-                    new EventTypeSubTotalPreviewFunction(PER_EVENT_TYPE_STATE_NAME))
-            .name("Individual Sums for each EventTye per Payment Period");
+  private void exposeQueryableTypePreviews(
+      final WindowedStream<BillableEvent, BillableEventType, TimeWindow> windowed) {
+    windowed
+        .trigger(CountTrigger.of(1))
+        .fold(
+            Money.zero(CurrencyUnit.EUR),
+            (accumulator, value) -> accumulator.plus(value.getAmount()),
+            new EventTypeSubTotalPreviewFunction(PER_EVENT_TYPE_STATE_NAME))
+        .name("Individual Sums for each EventTye per Payment Period");
   }
 
   private void outputFinalInvoice(WindowedStream<BillableEvent, String, TimeWindow> monthlyEvents) {
@@ -128,7 +132,7 @@ public class QueryableBillingJob {
       stateDescriptor = new ValueStateDescriptor<>(stateName, MonthlyCustomerSubTotal.class);
     }
 
-    private final ValueStateDescriptor          stateDescriptor;
+    private final ValueStateDescriptor stateDescriptor;
     private ValueState<MonthlyCustomerSubTotal> state;
 
     @Override
@@ -147,14 +151,15 @@ public class QueryableBillingJob {
         throws Exception {
       Money amount = input.iterator().next();
       MonthlyCustomerSubTotal monthlySubtotal =
-          new MonthlyCustomerSubTotal(customer, window.getStart() + " - " + window.getEnd(), amount);
+          new MonthlyCustomerSubTotal(
+              customer, window.getStart() + " - " + window.getEnd(), amount);
       state.update(monthlySubtotal);
       out.collect(monthlySubtotal);
     }
   }
 
   private static class EventTypeSubTotalPreviewFunction
-          extends RichWindowFunction<Money, MonthlyEventTypeSubTotal, BillableEventType, TimeWindow> {
+      extends RichWindowFunction<Money, MonthlyEventTypeSubTotal, BillableEventType, TimeWindow> {
 
     private String stateName;
 
@@ -163,7 +168,7 @@ public class QueryableBillingJob {
       stateDescriptor = new ValueStateDescriptor<>(stateName, MonthlyEventTypeSubTotal.class);
     }
 
-    private final ValueStateDescriptor          stateDescriptor;
+    private final ValueStateDescriptor stateDescriptor;
     private ValueState<MonthlyEventTypeSubTotal> state;
 
     @Override
@@ -175,14 +180,14 @@ public class QueryableBillingJob {
 
     @Override
     public void apply(
-            final BillableEventType type,
-            final TimeWindow window,
-            final Iterable<Money> input,
-            final Collector<MonthlyEventTypeSubTotal> out)
-            throws Exception {
+        final BillableEventType type,
+        final TimeWindow window,
+        final Iterable<Money> input,
+        final Collector<MonthlyEventTypeSubTotal> out)
+        throws Exception {
       Money amount = input.iterator().next();
       MonthlyEventTypeSubTotal monthlySubtotal =
-              new MonthlyEventTypeSubTotal(type, window.getStart() + " - " + window.getEnd(), amount);
+          new MonthlyEventTypeSubTotal(type, window.getStart() + " - " + window.getEnd(), amount);
       state.update(monthlySubtotal);
       out.collect(monthlySubtotal);
     }
