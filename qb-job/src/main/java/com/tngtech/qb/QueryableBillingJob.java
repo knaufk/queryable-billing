@@ -27,19 +27,19 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
 public class QueryableBillingJob {
-  @VisibleForTesting
-  final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
+  private final StreamExecutionEnvironment env;
   private final ParameterTool parameters;
 
-  QueryableBillingJob(ParameterTool parameters) {
+  QueryableBillingJob(
+      final StreamExecutionEnvironment executionEnvironment, ParameterTool parameters) {
     this.parameters = parameters;
-    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+    this.env = executionEnvironment;
+    this.env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
   }
 
   public static void main(String[] args) throws Exception {
     ParameterTool parameters = ParameterTool.fromArgs(args);
-    new QueryableBillingJob(parameters).run();
+    new QueryableBillingJob(StreamExecutionEnvironment.getExecutionEnvironment(), parameters).run();
   }
 
   void run() throws Exception {
