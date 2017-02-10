@@ -8,33 +8,48 @@ The project consists of two components, the queryable Flink job and a Spring Boo
 Manual Testing
 --------------
 1. Check out [Apache Flink](https://github.com/apache/flink)'s master branch and build using maven, i.e. go to flink repo (from now on $FLINK_DIR) and
-```
-mvn clean install -DskipTests
-```
+    ```
+    mvn clean package -DskipTests
+    ```
 2. Start local flink
-```
-$FLINK_DIR/build-target/bin/start-local.sh
-```
+    ```
+    $FLINK_DIR/build-target/bin/start-local.sh
+    ```
 3. Assemble flink jar (now in this project's directory)
-```
-./gradlew qb-job:shadowJar 
-```
+    ```
+    ./gradlew qb-job:shadowJar 
+    ```
 4. Submit jar
-```
-$FLINK_DIR/build-target/bin/flink run -d qb-job/build/libs/qb-job-0.1-SNAPSHOT-all.jar --output /tmp
-```
+    ```
+    $FLINK_DIR/build-target/bin/flink run -d qb-job/build/libs/qb-job-0.1-SNAPSHOT-all.jar --output /tmp
+    ```
 5. Build qb-server via
-```
-./gradlew qb-server:bootRepackage
-```
+    ```
+    ./gradlew qb-server:bootRepackage
+    ```
 6. Start via (replace job id)
-```
-java -jar qb-server/build/libs/qb-server-0.1-SNAPSHOT.jar --flink.configDir=$FLINK_DIR/flink-dist/src/main/resources --flink.jobIdHex=c9e2b987304fe3314b329fe0d17b2c8b
-```
+    ```
+    java -jar qb-server/build/libs/qb-server-0.1-SNAPSHOT.jar --flink.configDir=$FLINK_DIR/flink-dist/src/main/resources --flink.jobIdHex=c9e2b987304fe3314b329fe0d17b2c8b
+    ```
 7. Query at <http://localhost:8080/customers/{customer}> (You need to look in the text output for the names)
    Query at <http://localhost:8080/types/{type}> (MESSAGE, DATA, CALL, PACK, MISC)
 
 For faster feedback cycles have a look at `FlinkStateQueryServiceManualTest`
+
+Infrastructure for Distributed Testing
+--------------------------------------
+1. Clone *docker-ambari*
+    ```
+    git clone git@github.com:sequenceiq/docker-ambari.git
+    ```
+2. If using *docker-machine*
+    ```
+    sudo route -n add -net 172.17.0.0/16 $(docker-machine ip)
+    ```
+3. Deploy cluster
+    ```
+    amb-deploy-cluster
+    ```
 
 What's next
 -----------

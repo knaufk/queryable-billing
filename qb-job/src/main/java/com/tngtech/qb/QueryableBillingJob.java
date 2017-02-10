@@ -2,8 +2,11 @@ package com.tngtech.qb;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.tngtech.qb.BillableEvent.BillableEventType;
+import org.apache.flink.api.common.functions.FoldFunction;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.typeinfo.TypeHint;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
@@ -72,7 +75,7 @@ public class QueryableBillingJob {
   private WindowedStream<BillableEvent, BillableEventType, TimeWindow> windowByType(
       final DataStream<BillableEvent> billableEvents) {
     return billableEvents
-        .keyBy((KeySelector<BillableEvent, BillableEventType>) value -> value.getType())
+        .keyBy((KeySelector<BillableEvent, BillableEventType>) BillableEvent::getType)
         .window(TumblingEventTimeWindows.of(ONE_MONTH))
         .allowedLateness(Time.of(2, TimeUnit.SECONDS));
   }
@@ -80,7 +83,7 @@ public class QueryableBillingJob {
   private WindowedStream<BillableEvent, String, TimeWindow> windowByCustomer(
       DataStream<BillableEvent> billableEvents) {
     return billableEvents
-        .keyBy((KeySelector<BillableEvent, String>) value -> value.getCustomer())
+        .keyBy((KeySelector<BillableEvent, String>) BillableEvent::getCustomer)
         .window(TumblingEventTimeWindows.of(ONE_MONTH))
         .allowedLateness(Time.of(2, TimeUnit.SECONDS));
   }
@@ -98,9 +101,12 @@ public class QueryableBillingJob {
         .trigger(CountTrigger.of(1))
         .fold(
             Money.zero(CurrencyUnit.EUR),
-            (accumulator, value) -> accumulator.plus(value.getAmount()),
-            new EventTypeSubTotalPreviewFunction(PER_EVENT_TYPE_STATE_NAME))
-        .name("Individual Sums for each EventTye per Payment Period");
+            (FoldFunction<BillableEvent, Money>)
+                (accumulator, value) -> accumulator.plus(value.getAmount()),
+            new EventTypeSubTotalPreviewFunction(PER_EVENT_TYPE_STATE_NAME),
+            TypeInformation.of(new TypeHint<Money>() {}),
+            TypeInformation.of(new TypeHint<MonthlyEventTypeSubTotal>() {}))
+        .name("Individual Sums for each EventType per Payment Period");
   }
 
   private void outputFinalInvoice(WindowedStream<BillableEvent, String, TimeWindow> monthlyEvents) {
@@ -118,7 +124,9 @@ public class QueryableBillingJob {
         .fold(
             Money.zero(CurrencyUnit.EUR),
             (accumulator, value) -> accumulator.plus(value.getAmount()),
-            new CustomerSubTotalPreviewFunction(stateName))
+            new CustomerSubTotalPreviewFunction(stateName),
+            TypeInformation.of(new TypeHint<Money>() {}),
+            TypeInformation.of(new TypeHint<MonthlyCustomerSubTotal>() {}))
         .name("Individual Sums for each Customer per Payment Period");
   }
 
@@ -127,9 +135,11 @@ public class QueryableBillingJob {
 
     private String stateName;
 
-    public CustomerSubTotalPreviewFunction(String stateName) {
+    CustomerSubTotalPreviewFunction(String stateName) {
       this.stateName = stateName;
-      stateDescriptor = new ValueStateDescriptor<>(stateName, MonthlyCustomerSubTotal.class);
+      stateDescriptor =
+          new ValueStateDescriptor<>(
+              stateName, MonthlyCustomerSubTotal.class, MonthlyCustomerSubTotal.empty());
     }
 
     private final ValueStateDescriptor stateDescriptor;
@@ -163,9 +173,11 @@ public class QueryableBillingJob {
 
     private String stateName;
 
-    public EventTypeSubTotalPreviewFunction(String stateName) {
+    EventTypeSubTotalPreviewFunction(String stateName) {
       this.stateName = stateName;
-      stateDescriptor = new ValueStateDescriptor<>(stateName, MonthlyEventTypeSubTotal.class);
+      stateDescriptor =
+          new ValueStateDescriptor<>(
+              stateName, MonthlyEventTypeSubTotal.class, MonthlyEventTypeSubTotal.empty());
     }
 
     private final ValueStateDescriptor stateDescriptor;

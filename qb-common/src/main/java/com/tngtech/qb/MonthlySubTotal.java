@@ -11,7 +11,7 @@ public class MonthlySubTotal<T> {
   private final String month;
   private final Money total;
 
-  public MonthlySubTotal empty() {
+  public static MonthlySubTotal empty() {
     return new MonthlySubTotal("", "", Money.zero(CurrencyUnit.EUR));
   }
 
