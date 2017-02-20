@@ -42,6 +42,10 @@ public class BillableEvent {
     return new BillableEvent(timestampMs, newCustomer, amount, type);
   }
 
+  BillableEvent withEventType(BillableEventType type) {
+    return new BillableEvent(timestampMs, customer, amount, type);
+  }
+
   public BillableEventType getType() {
     return type;
   }

@@ -66,7 +66,13 @@ class QueryableBillingJobSpec extends Specification {
         def random = new Random();
         env.fromCollection(
                 LongStream.range(1, 1000)
-                        .collect({ new BillableEvent().withEuroAmount(it).withCustomer(["Anton", "Berta", "Charlie"].get(random.nextInt(3))) }))
+                        .collect({
+                    def customers = ["Anton", "Berta", "Charlie"]
+                    def types = BillableEvent.BillableEventType.values().toList()
+                    new BillableEvent().withEuroAmount(it)
+                                       .withCustomer(customers.get(random.nextInt(customers.size())))
+                                       .withEventType(types.get(random.nextInt(types.size()))
+                    )}))
                 .assignTimestampsAndWatermarks(
                 new TestTimestampAssigner(Time.seconds(1)))
     }

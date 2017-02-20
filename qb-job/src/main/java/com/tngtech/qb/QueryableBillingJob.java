@@ -3,24 +3,19 @@ package com.tngtech.qb;
 import com.google.common.annotations.VisibleForTesting;
 import com.tngtech.qb.BillableEvent.BillableEventType;
 import org.apache.flink.api.common.functions.FoldFunction;
-import org.apache.flink.api.common.state.ValueState;
-import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.utils.ParameterTool;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.windowing.RichWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.triggers.CountTrigger;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.fs.bucketing.BucketingSink;
-import org.apache.flink.util.Collector;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
@@ -59,18 +54,14 @@ public class QueryableBillingJob {
   }
 
   private void process(DataStream<BillableEvent> billableEvents) {
-
-    //    WindowedStream<BillableEvent, BillableEventType, TimeWindow> perEventTypeWindows =
-    //        windowByType(billableEvents);
-
-    //    exposeQueryableTypePreviews(perEventTypeWindows);
+    outputFinalInvoice(billableEvents);
 
     exposeQueryableCustomerPreviews(billableEvents);
-
-    outputFinalInvoice(billableEvents);
+    exposeQueryableTypePreviews(billableEvents);
   }
 
   private void outputFinalInvoice(final DataStream<BillableEvent> billableEvents) {
+    //TOOO why state here?
     sumUp(windowByCustomer(billableEvents), "something")
         .addSink(
             new BucketingSink<MonthlyCustomerSubTotal>(parameters.getRequired("output"))
@@ -101,9 +92,8 @@ public class QueryableBillingJob {
         .allowedLateness(Time.of(2, TimeUnit.SECONDS));
   }
 
-  private void exposeQueryableTypePreviews(
-      final WindowedStream<BillableEvent, BillableEventType, TimeWindow> windowed) {
-    windowed
+  private void exposeQueryableTypePreviews(final DataStream<BillableEvent> billableEvents) {
+    windowByType(billableEvents)
         .trigger(CountTrigger.of(1))
         .fold(
             Money.zero(CurrencyUnit.EUR),
@@ -125,76 +115,5 @@ public class QueryableBillingJob {
             TypeInformation.of(new TypeHint<Money>() {}),
             TypeInformation.of(new TypeHint<MonthlyCustomerSubTotal>() {}))
         .name("Individual Sums for each Customer per Payment Period");
-  }
-
-  private static class CustomerSubTotalPreviewFunction
-      extends RichWindowFunction<Money, MonthlyCustomerSubTotal, String, TimeWindow> {
-
-    private String stateName;
-
-    CustomerSubTotalPreviewFunction(String stateName) {
-      this.stateName = stateName;
-      stateDescriptor = new ValueStateDescriptor<>(stateName, MonthlyCustomerSubTotal.class);
-    }
-
-    private final ValueStateDescriptor stateDescriptor;
-    private ValueState<MonthlyCustomerSubTotal> state;
-
-    @Override
-    public void open(Configuration parameters) throws Exception {
-      super.open(parameters);
-      stateDescriptor.setQueryable(stateName);
-      state = getRuntimeContext().getState(stateDescriptor);
-    }
-
-    @Override
-    public void apply(
-        final String customer,
-        final TimeWindow window,
-        final Iterable<Money> input,
-        final Collector<MonthlyCustomerSubTotal> out)
-        throws Exception {
-      Money amount = input.iterator().next();
-      MonthlyCustomerSubTotal monthlySubtotal =
-          new MonthlyCustomerSubTotal(
-              customer, window.getStart() + " - " + window.getEnd(), amount);
-      state.update(monthlySubtotal);
-      out.collect(monthlySubtotal);
-    }
-  }
-
-  private static class EventTypeSubTotalPreviewFunction
-      extends RichWindowFunction<Money, MonthlyEventTypeSubTotal, BillableEventType, TimeWindow> {
-
-    private String stateName;
-
-    EventTypeSubTotalPreviewFunction(String stateName) {
-      this.stateName = stateName;
-      stateDescriptor = new ValueStateDescriptor<>(stateName, MonthlyEventTypeSubTotal.class);
-    }
-
-    private final ValueStateDescriptor stateDescriptor;
-    private ValueState<MonthlyEventTypeSubTotal> state;
-
-    @Override
-    public void open(Configuration parameters) throws Exception {
-      super.open(parameters);
-      stateDescriptor.setQueryable(stateName);
-      state = getRuntimeContext().getState(stateDescriptor);
-    }
-
-    @Override
-    public void apply(
-        final BillableEventType type,
-        final TimeWindow window,
-        final Iterable<Money> input,
-        final Collector<MonthlyEventTypeSubTotal> out)
-        throws Exception {
-      Money amount = input.iterator().next();
-      MonthlyEventTypeSubTotal monthlySubtotal =
-          new MonthlyEventTypeSubTotal(type, window.getStart() + " - " + window.getEnd(), amount);
-      state.update(monthlySubtotal);
-      out.collect(monthlySubtotal);
-    }
   }
 }
