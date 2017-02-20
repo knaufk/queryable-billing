@@ -12,8 +12,4 @@ public class MonthlyEventTypeSubTotal extends MonthlySubTotal<BillableEventType>
       final BillableEventType type, final String month, final Money total) {
     super(type, month, total);
   }
-
-  public static MonthlyEventTypeSubTotal empty() {
-    return new MonthlyEventTypeSubTotal(BillableEventType.MISC, "", Money.zero(CurrencyUnit.EUR));
-  }
 }
