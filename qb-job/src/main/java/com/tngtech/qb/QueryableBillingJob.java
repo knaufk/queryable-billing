@@ -137,9 +137,7 @@ public class QueryableBillingJob {
 
     CustomerSubTotalPreviewFunction(String stateName) {
       this.stateName = stateName;
-      stateDescriptor =
-          new ValueStateDescriptor<>(
-              stateName, MonthlyCustomerSubTotal.class, MonthlyCustomerSubTotal.empty());
+      stateDescriptor = new ValueStateDescriptor<>(stateName, MonthlyCustomerSubTotal.class);
     }
 
     private final ValueStateDescriptor stateDescriptor;
@@ -175,9 +173,7 @@ public class QueryableBillingJob {
 
     EventTypeSubTotalPreviewFunction(String stateName) {
       this.stateName = stateName;
-      stateDescriptor =
-          new ValueStateDescriptor<>(
-              stateName, MonthlyEventTypeSubTotal.class, MonthlyEventTypeSubTotal.empty());
+      stateDescriptor = new ValueStateDescriptor<>(stateName, MonthlyEventTypeSubTotal.class);
     }
 
     private final ValueStateDescriptor stateDescriptor;
