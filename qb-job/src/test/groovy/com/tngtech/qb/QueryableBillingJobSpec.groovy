@@ -45,8 +45,6 @@ class QueryableBillingJobSpec extends Specification {
             }
         }
 
-        print(outputLines)
-
         then:
         assertThat(outputLines, anyOf(hasSize(3), hasSize(6)))
         ["Anton", "Berta", "Charlie"].forEach({ assertThat(outputLines, hasItem(containsString(it))) })

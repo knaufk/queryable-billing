@@ -60,16 +60,29 @@ public class QueryableBillingJob {
 
   private void process(DataStream<BillableEvent> billableEvents) {
 
-    WindowedStream<BillableEvent, String, TimeWindow> perCustomerWindows =
-        windowByCustomer(billableEvents);
+    //    WindowedStream<BillableEvent, BillableEventType, TimeWindow> perEventTypeWindows =
+    //        windowByType(billableEvents);
 
-    WindowedStream<BillableEvent, BillableEventType, TimeWindow> perEventTypeWindows =
-        windowByType(billableEvents);
+    //    exposeQueryableTypePreviews(perEventTypeWindows);
 
-    exposeQueryableTypePreviews(perEventTypeWindows);
+    exposeQueryableCustomerPreviews(billableEvents);
 
-    exposeQueryableCustomerPreviews(perCustomerWindows);
-    outputFinalInvoice(perCustomerWindows);
+    outputFinalInvoice(billableEvents);
+  }
+
+  private void outputFinalInvoice(final DataStream<BillableEvent> billableEvents) {
+    sumUp(windowByCustomer(billableEvents), "something")
+        .addSink(
+            new BucketingSink<MonthlyCustomerSubTotal>(parameters.getRequired("output"))
+                .setInactiveBucketCheckInterval(10)
+                .setInactiveBucketThreshold(10))
+        .name("Create Final Invoices");
+  }
+
+  private void exposeQueryableCustomerPreviews(final DataStream<BillableEvent> billableEvents) {
+    final WindowedStream<BillableEvent, String, TimeWindow> eventsSoFar =
+        windowByCustomer(billableEvents).trigger(CountTrigger.of(1));
+    sumUp(eventsSoFar, Constants.PER_CUSTOMER_STATE_NAME);
   }
 
   private WindowedStream<BillableEvent, BillableEventType, TimeWindow> windowByType(
@@ -88,13 +101,6 @@ public class QueryableBillingJob {
         .allowedLateness(Time.of(2, TimeUnit.SECONDS));
   }
 
-  private void exposeQueryableCustomerPreviews(
-      WindowedStream<BillableEvent, String, TimeWindow> windowed) {
-    final WindowedStream<BillableEvent, String, TimeWindow> eventsSoFar =
-        windowed.trigger(CountTrigger.of(1));
-    sumUp(eventsSoFar, Constants.PER_CUSTOMER_STATE_NAME);
-  }
-
   private void exposeQueryableTypePreviews(
       final WindowedStream<BillableEvent, BillableEventType, TimeWindow> windowed) {
     windowed
@@ -107,15 +113,6 @@ public class QueryableBillingJob {
             TypeInformation.of(new TypeHint<Money>() {}),
             TypeInformation.of(new TypeHint<MonthlyEventTypeSubTotal>() {}))
         .name("Individual Sums for each EventType per Payment Period");
-  }
-
-  private void outputFinalInvoice(WindowedStream<BillableEvent, String, TimeWindow> monthlyEvents) {
-    sumUp(monthlyEvents, "something")
-        .addSink(
-            new BucketingSink<MonthlyCustomerSubTotal>(parameters.getRequired("output"))
-                .setInactiveBucketCheckInterval(10)
-                .setInactiveBucketThreshold(10))
-        .name("Create Final Invoices");
   }
 
   private DataStream<MonthlyCustomerSubTotal> sumUp(
