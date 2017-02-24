@@ -12,5 +12,4 @@ class QueryNotPossibleException extends RuntimeException {
   QueryNotPossibleException(String reason) {
     super(reason);
   }
-
 }

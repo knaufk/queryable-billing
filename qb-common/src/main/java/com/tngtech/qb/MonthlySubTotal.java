@@ -6,9 +6,9 @@ import java.util.Objects;
 
 public class MonthlySubTotal<T> {
 
-  private final T      basis;
+  private final T basis;
   private final String month;
-  private final Money  total;
+  private final Money total;
 
   public MonthlySubTotal(final T basis, String month, final Money total) {
     this.basis = basis;

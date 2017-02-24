@@ -36,7 +36,6 @@ public class BillableEventGenerator {
     this.maxDelayMs = maxDelayMs;
     NameGenerator generator = new NameGenerator();
     customers = generator.generateNames(NO_OF_CUSTOMERS);
-
   }
 
   public BillableEvent next() {
