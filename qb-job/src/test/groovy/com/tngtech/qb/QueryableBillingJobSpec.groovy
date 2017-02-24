@@ -2,6 +2,7 @@ package com.tngtech.qb
 
 import com.google.common.collect.ImmutableMap
 import groovy.io.FileType
+import info.batey.kafka.unit.KafkaUnitRule
 import org.apache.flink.api.java.utils.ParameterTool
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
@@ -23,6 +24,9 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem
 class QueryableBillingJobSpec extends Specification {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder()
+
+    @Rule
+    public KafkaUnitRule kafkaUnitRule = new KafkaUnitRule();
 
     private QueryableBillingJob job
     private StreamExecutionEnvironment env
@@ -70,9 +74,10 @@ class QueryableBillingJobSpec extends Specification {
                     def customers = ["Anton", "Berta", "Charlie"]
                     def types = BillableEvent.BillableEventType.values().toList()
                     new BillableEvent().withEuroAmount(it)
-                                       .withCustomer(customers.get(random.nextInt(customers.size())))
-                                       .withEventType(types.get(random.nextInt(types.size()))
-                    )}))
+                            .withCustomer(customers.get(random.nextInt(customers.size())))
+                            .withEventType(types.get(random.nextInt(types.size()))
+                    )
+                }))
                 .assignTimestampsAndWatermarks(
                 new TestTimestampAssigner(Time.seconds(1)))
     }
