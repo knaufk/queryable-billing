@@ -12,6 +12,7 @@ import org.apache.flink.runtime.query.netty.message.KvStateRequestSerializer;
 import org.apache.flink.runtime.state.VoidNamespace;
 import org.apache.flink.runtime.state.VoidNamespaceSerializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
@@ -21,7 +22,8 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class FlinkStateQueryService {
+@Profile("flink")
+public class FlinkStateQueryService implements StateQueryService {
   private final QueryableStateClient client;
   private final JobID jobId;
 
@@ -33,7 +35,8 @@ public class FlinkStateQueryService {
     client = new QueryableStateClient(GlobalConfiguration.loadConfiguration(flinkConfigDir));
   }
 
-  MonthlyCustomerSubTotal findOne(String customer) throws Exception {
+  @Override
+  public MonthlyCustomerSubTotal findOne(String customer) throws Exception {
     final Future<byte[]> stateFuture =
         client.getKvState(
             jobId,
@@ -45,6 +48,7 @@ public class FlinkStateQueryService {
     return deserializeCustomer(serializedResult);
   }
 
+  @Override
   public MonthlyEventTypeSubTotal findOne(final BillableEventType type) throws Exception {
     final Future<byte[]> stateFuture =
         client.getKvState(

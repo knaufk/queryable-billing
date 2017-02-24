@@ -1,24 +1,23 @@
 package com.tngtech.qb;
 
-import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
 import java.util.Objects;
 
 public class MonthlySubTotal<T> {
 
-  private final T customer;
+  private final T      basis;
   private final String month;
-  private final Money total;
+  private final Money  total;
 
-  public MonthlySubTotal(final T customer, String month, final Money total) {
-    this.customer = customer;
+  public MonthlySubTotal(final T basis, String month, final Money total) {
+    this.basis = basis;
     this.month = month;
     this.total = total;
   }
 
-  public T getCustomer() {
-    return customer;
+  public T getBasis() {
+    return basis;
   }
 
   public Money getTotal() {
@@ -34,7 +33,7 @@ public class MonthlySubTotal<T> {
     StringBuilder sb = new StringBuilder();
     sb.append(month);
     sb.append(":\t");
-    sb.append(customer);
+    sb.append(basis);
     sb.append(": ");
     sb.append(total);
     return sb.toString();
@@ -49,13 +48,13 @@ public class MonthlySubTotal<T> {
       return false;
     }
     final MonthlySubTotal that = (MonthlySubTotal) o;
-    return Objects.equals(customer, that.customer)
+    return Objects.equals(basis, that.basis)
         && Objects.equals(month, that.month)
         && Objects.equals(total, that.total);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(customer, month, total);
+    return Objects.hash(basis, month, total);
   }
 }

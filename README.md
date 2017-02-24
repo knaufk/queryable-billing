@@ -29,10 +29,15 @@ Manual Testing
     ```
 6. Start via (replace job id)
     ```
-    java -jar qb-server/build/libs/qb-server-0.1-SNAPSHOT.jar --flink.configDir=$FLINK_DIR/flink-dist/src/main/resources --flink.jobIdHex=c9e2b987304fe3314b329fe0d17b2c8b
+    java -jar -Dspring.profiles.active=flink qb-server/build/libs/qb-server-0.1-SNAPSHOT.jar --flink.configDir=$FLINK_DIR/flink-dist/src/main/resources --flink.jobIdHex=c9e2b987304fe3314b329fe0d17b2c8b
     ```
-7. Query at <http://localhost:8080/customers/{customer}> (You need to look in the text output for the names)
+7. Alternatively, the server can be started standalone without Flink as a backend like this: 
+    ```
+    java -jar -Dspring.profiles.active=standalone qb-server/build/libs/qb-server-0.1-SNAPSHOT.jar 
+    ```
+8. Query at <http://localhost:8080/customers/{customer}> (You need to look in the text output for the names)
    Query at <http://localhost:8080/types/{type}> (MESSAGE, DATA, CALL, PACK, MISC)
+
 
 For faster feedback cycles have a look at `FlinkStateQueryServiceManualTest`
 

@@ -81,5 +81,4 @@ class QueryableBillingJobSpec extends Specification {
                 .assignTimestampsAndWatermarks(
                 new TestTimestampAssigner(Time.seconds(1)))
     }
-
 }
