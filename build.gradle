@@ -13,7 +13,6 @@ buildscript {
 ext.flinkVersion = '1.2.0'
 
 allprojects {
-    apply plugin: 'java'
     apply plugin: 'groovy'
     apply plugin: 'com.diffplug.gradle.spotless'
     apply plugin: 'findbugs'
