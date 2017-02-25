@@ -8,10 +8,7 @@ dependencies {
             "org.apache.flink:flink-connector-filesystem_2.11:$flinkVersion",
             "org.apache.flink:flink-connector-kafka-0.10_2.11:$flinkVersion")
 
-    testCompile("org.apache.flink:flink-test-utils_2.11:$flinkVersion")
-    testCompile('info.batey.kafka:kafka-unit:0.6') {
-        exclude module: 'commons-io'
-    }
+    testCompile "org.apache.flink:flink-test-utils_2.11:$flinkVersion"
 }
 
 shadowJar {

@@ -2,6 +2,7 @@ package com.tngtech.qb;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.tngtech.qb.BillableEvent.BillableEventType;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.FoldFunction;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -9,31 +10,38 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.triggers.CountTrigger;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.fs.bucketing.BucketingSink;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
+import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
+import java.math.RoundingMode;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import static com.tngtech.qb.Constants.PER_EVENT_TYPE_STATE_NAME;
 
 public class QueryableBillingJob {
+
   private final StreamExecutionEnvironment env;
   private final ParameterTool parameters;
 
-  private static final Time ONE_MONTH = Time.seconds(60);
+  private static final Time ONE_MONTH = Time.seconds(5);
 
   QueryableBillingJob(
       final StreamExecutionEnvironment executionEnvironment, ParameterTool parameters) {
     this.parameters = parameters;
-    this.env = executionEnvironment;
-    this.env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+    env = executionEnvironment;
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
     env.enableCheckpointing(100);
   }
 
@@ -50,18 +58,54 @@ public class QueryableBillingJob {
 
   @VisibleForTesting
   DataStream<BillableEvent> billableEvents() {
-    return env.addSource(new SimpleBillableEventSource()).name("BillableEventSource");
+    Properties properties = new Properties();
+    properties.setProperty("bootstrap.servers", parameters.getRequired("bootstrap-servers"));
+    properties.setProperty("group.id", "test");
+    //TODO serialization (avro?), including event types
+    //TODO timestamp in kafka?
+    final DataStream<String> strings =
+        env.addSource(
+                new FlinkKafkaConsumer010<>(
+                    Constants.SRC_KAFKA_TOPIC, new SimpleStringSchema(), properties))
+            .name("BillableEventSource (Kafka)");
+    final SingleOutputStreamOperator<BillableEvent> events =
+        strings
+            .flatMap(
+                (FlatMapFunction<String, BillableEvent>)
+                    (value, out) -> {
+                      try {
+                        final String[] fields = value.split(",");
+                        out.collect(
+                            new BillableEvent(
+                                Long.valueOf(fields[0]),
+                                fields[1],
+                                Money.of(
+                                    CurrencyUnit.EUR, Double.valueOf(fields[2]), RoundingMode.UP),
+                                BillableEventType.MISC));
+                      } catch (Exception e) {
+                        e.printStackTrace();
+                      }
+                    })
+            .returns(BillableEvent.class);
+    return events.assignTimestampsAndWatermarks(
+        new BoundedOutOfOrdernessTimestampExtractor<BillableEvent>(Time.of(1, TimeUnit.SECONDS)) {
+          @Override
+          public long extractTimestamp(final BillableEvent element) {
+            return element.getTimestampMs();
+          }
+        });
   }
 
   private void process(DataStream<BillableEvent> billableEvents) {
     outputFinalInvoice(billableEvents);
 
     exposeQueryableCustomerPreviews(billableEvents);
-    exposeQueryableTypePreviews(billableEvents);
+    //TODO key group problem
+    //    exposeQueryableTypePreviews(billableEvents);
   }
 
   private void outputFinalInvoice(final DataStream<BillableEvent> billableEvents) {
-    //TOOO why state here?
+    //TODO why state here?
     sumUp(windowByCustomer(billableEvents), "something")
         .addSink(
             new BucketingSink<MonthlyCustomerSubTotal>(parameters.getRequired("output"))

@@ -19,42 +19,34 @@ Manual Testing
     ```
     ./gradlew qb-job:shadowJar 
     ```
-4. Submit jar
+4. Start local zookeeper and kafka, e.g.
+    ```
+    zookeeper-server-start /usr/local/etc/kafka/zookeeper.properties & kafka-server-start /usr/local/etc/kafka/server.properties
+    ```
+5. Submit jar
     ```
     $FLINK_DIR/build-target/bin/flink run -d qb-job/build/libs/qb-job-0.1-SNAPSHOT-all.jar --output /tmp
     ```
-5. Build qb-server via
+6. Build qb-server via
     ```
     ./gradlew qb-server:bootRepackage
     ```
-6. Start via (replace job id)
+7. Produce test data to kafka, i.e. lines like `1488142855,Charlie,199.99` to
+    ```
+    kafka-console-producer --broker-list localhost:9092 --topic billableevents.incoming
+    ```
+8. Start via (replace job id)
     ```
     java -jar -Dspring.profiles.active=flink qb-server/build/libs/qb-server-0.1-SNAPSHOT.jar --flink.configDir=$FLINK_DIR/flink-dist/src/main/resources --flink.jobIdHex=c9e2b987304fe3314b329fe0d17b2c8b
     ```
-7. Alternatively, the server can be started standalone without Flink as a backend like this: 
+9. Alternatively, the server can be started standalone without Flink as a backend like this: 
     ```
     java -jar -Dspring.profiles.active=standalone qb-server/build/libs/qb-server-0.1-SNAPSHOT.jar 
     ```
-8. Query at <http://localhost:8080/customers/{customer}> (You need to look in the text output for the names)
-   Query at <http://localhost:8080/types/{type}> (MESSAGE, DATA, CALL, PACK, MISC)
-
+10. Query at <http://localhost:8080/customers/{customer}> (You need to look in the text output for the names)
+    Query at <http://localhost:8080/types/{type}> (MESSAGE, DATA, CALL, PACK, MISC)
 
 For faster feedback cycles have a look at `FlinkStateQueryServiceManualTest`
-
-Infrastructure for Distributed Testing
---------------------------------------
-1. Clone *docker-ambari*
-    ```
-    git clone git@github.com:sequenceiq/docker-ambari.git
-    ```
-2. If using *docker-machine*
-    ```
-    sudo route -n add -net 172.17.0.0/16 $(docker-machine ip)
-    ```
-3. Deploy cluster
-    ```
-    amb-deploy-cluster
-    ```
 
 What's next
 -----------

@@ -2,7 +2,6 @@ package com.tngtech.qb
 
 import com.google.common.collect.ImmutableMap
 import groovy.io.FileType
-import info.batey.kafka.unit.KafkaUnitRule
 import org.apache.flink.api.java.utils.ParameterTool
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
@@ -25,15 +24,14 @@ class QueryableBillingJobSpec extends Specification {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder()
 
-    @Rule
-    public KafkaUnitRule kafkaUnitRule = new KafkaUnitRule();
-
     private QueryableBillingJob job
     private StreamExecutionEnvironment env
 
     def setup() {
         env = StreamExecutionEnvironment.getExecutionEnvironment()
-        job = Spy(QueryableBillingJob, constructorArgs: [this.env, ParameterTool.fromMap(ImmutableMap.of("output", temporaryFolder.getRoot().getPath()))]) {
+
+        job = Spy(QueryableBillingJob, constructorArgs: [this.env, ParameterTool.fromMap(ImmutableMap.of(
+                "output", temporaryFolder.getRoot().getPath()))]) {
             billableEvents() >> createTestSource()
         }
     }
@@ -41,6 +39,7 @@ class QueryableBillingJobSpec extends Specification {
     def "final invoices are written"() {
         setup:
         job.run()
+
         when:
         def outputLines = []
         temporaryFolder.getRoot().eachFileRecurse(FileType.FILES) { file ->
@@ -52,7 +51,6 @@ class QueryableBillingJobSpec extends Specification {
         then:
         assertThat(outputLines, anyOf(hasSize(3), hasSize(6)))
         ["Anton", "Berta", "Charlie"].forEach({ assertThat(outputLines, hasItem(containsString(it))) })
-
     }
 
     static class TestTimestampAssigner extends BoundedOutOfOrdernessTimestampExtractor<BillableEvent> {
@@ -69,16 +67,15 @@ class QueryableBillingJobSpec extends Specification {
     private SingleOutputStreamOperator<BillableEvent> createTestSource() {
         def random = new Random();
         env.fromCollection(
-                LongStream.range(1, 1000)
-                        .collect({
-                    def customers = ["Anton", "Berta", "Charlie"]
-                    def types = BillableEvent.BillableEventType.values().toList()
-                    new BillableEvent().withEuroAmount(it)
-                            .withCustomer(customers.get(random.nextInt(customers.size())))
-                            .withEventType(types.get(random.nextInt(types.size()))
-                    )
-                }))
-                .assignTimestampsAndWatermarks(
-                new TestTimestampAssigner(Time.seconds(1)))
+            LongStream.range(1, 1000)
+                      .collect({
+                def customers = ["Anton", "Berta", "Charlie"]
+                def types = BillableEvent.BillableEventType.values().toList()
+                new BillableEvent().withEuroAmount(it)
+                        .withCustomer(customers.get(random.nextInt(customers.size())))
+                        .withEventType(types.get(random.nextInt(types.size()))
+                )
+            }))
+           .assignTimestampsAndWatermarks(new TestTimestampAssigner(Time.seconds(1)))
     }
 }
