@@ -8,7 +8,9 @@ dependencies {
             "org.apache.flink:flink-connector-filesystem_2.11:$flinkVersion",
             "org.apache.flink:flink-connector-kafka-0.10_2.11:$flinkVersion")
 
-    testCompile "org.apache.flink:flink-test-utils_2.11:$flinkVersion"
+    testCompile("org.apache.flink:flink-test-utils_2.11:$flinkVersion",
+            'org.apache.kafka:kafka-clients:0.10.0.1')
+
 }
 
 shadowJar {
