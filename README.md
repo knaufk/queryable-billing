@@ -50,18 +50,15 @@ For faster feedback cycles have a look at `FlinkStateQueryServiceManualTest`
 
 What's next
 -----------
-- [ ] investigate why there is an additional source -> sink in job dashboard
-- [ ] investigate kryo serialization error, when jobs runs for a while
-- [ ] **MB** create infrastructure for distributed tests (e.g. YARN via docker or vagrant, ...)
-- [ ] **KKn** create Splunk Setup
-- [ ] `SimpleBillableEventSoure` &rarr; Kafka source and Kafka test data generator, add timestamp extractor
-- [ ] investigate [simple-json-datasource](https://github.com/grafana/simple-json-datasource) Grafana plugin for management dashboard
-- [x] investigate Splunk REST query for management dashboard -> Should work (Check: http://blogs.splunk.com/2013/06/18/getting-data-from-your-rest-apis-into-splunk/)
+- [ ] Reactivate event types and include in Kafka serialization
+- [ ] Data generator jar (10 hardcoded names, runs to eternity, delay configurable)
+- [ ] create infrastructure for distributed tests (e.g. YARN via docker or vagrant, ...) -> script für cluster (1JM, 1TM , zookeeper, kafka, job, server, data generator)
+- [ ] create Splunk Setup (Management Dashboard per type), see <http://blogs.splunk.com/2013/06/18/getting-data-from-your-rest-apis-into-splunk/> (alternatively investigate [simple-json-datasource](https://github.com/grafana/simple-json-datasource) Grafana plugin for management dashboard)
 - [ ] Checkpointing, test task manager failures
 - [ ] JM HA, test job manager failures
 - [ ] Simulate downstream system failures
+- [ ] Expose metrics in job (for Flink Web UI)
+- [ ] investigate kryo serialization error, when jobs runs for a while ?
 
 Nice to have:
-- [ ] Get job id from flink instead of having to provide it at startup time
-- [ ] improve REST interface, maybe using [Spring Data REST](http://docs.spring.io/spring-data/rest/docs/current/reference/html/)
-- [ ] Expose metrics in job (for Flink Web UI or Grafana?)
+- [ ] Get job id from flink instead of having to provide it at startup time (hopefully already done in script?)
