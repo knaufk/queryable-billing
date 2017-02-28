@@ -70,8 +70,6 @@ public class QueryableBillingJob {
     Properties properties = new Properties();
     properties.setProperty("bootstrap.servers", parameters.getRequired("bootstrap-servers"));
     properties.setProperty("group.id", "test");
-    //TODO serialization (avro?), including event types
-    //TODO timestamp in kafka?
     return env.addSource(
             new FlinkKafkaConsumer010<>(
                 Constants.SRC_KAFKA_TOPIC, new SimpleStringSchema(), properties))
@@ -86,7 +84,7 @@ public class QueryableBillingJob {
                             Long.valueOf(fields[0]),
                             fields[1],
                             Money.of(CurrencyUnit.EUR, Double.valueOf(fields[2]), RoundingMode.UP),
-                            BillableEventType.MISC));
+                            BillableEvent.BillableEventType.valueOf(fields[3].toUpperCase())));
                   } catch (Exception e) {
                     e.printStackTrace();
                   }
@@ -99,7 +97,7 @@ public class QueryableBillingJob {
 
     exposeQueryableCustomerPreviews(billableEvents);
     //TODO key group problem
-    //    exposeQueryableTypePreviews(billableEvents);
+    //exposeQueryableTypePreviews(billableEvents);
   }
 
   private void outputFinalInvoice(final DataStream<BillableEvent> billableEvents) {

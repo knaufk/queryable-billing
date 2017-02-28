@@ -50,8 +50,8 @@ For faster feedback cycles have a look at `FlinkStateQueryServiceManualTest`
 
 What's next
 -----------
+- [x] Data generator jar (10 hardcoded names, runs to eternity, delay configurable)
 - [ ] Reactivate event types and include in Kafka serialization
-- [ ] Data generator jar (10 hardcoded names, runs to eternity, delay configurable)
 - [ ] create infrastructure for distributed tests (e.g. YARN via docker or vagrant, ...) -> script für cluster (1JM, 1TM , zookeeper, kafka, job, server, data generator)
 - [ ] create Splunk Setup (Management Dashboard per type), see <http://blogs.splunk.com/2013/06/18/getting-data-from-your-rest-apis-into-splunk/> (alternatively investigate [simple-json-datasource](https://github.com/grafana/simple-json-datasource) Grafana plugin for management dashboard)
 - [ ] Checkpointing, test task manager failures
