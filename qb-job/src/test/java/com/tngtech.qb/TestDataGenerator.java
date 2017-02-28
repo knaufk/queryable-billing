@@ -21,7 +21,6 @@ public class TestDataGenerator {
 
     List<String> customers = Lists.newArrayList("Anton", "Berta", "Charlie");
 
-
     for (int i = 0; i < 1000; i++) {
       Thread.sleep(100);
       //TODO integrate event types

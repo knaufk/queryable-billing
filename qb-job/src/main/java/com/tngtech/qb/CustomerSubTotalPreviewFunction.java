@@ -8,24 +8,32 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 import org.joda.money.Money;
 
+import java.util.Optional;
+
 class CustomerSubTotalPreviewFunction
     extends RichWindowFunction<Money, MonthlyCustomerSubTotal, String, TimeWindow> {
 
+  private final boolean queryable;
+
   private String stateName;
-
-  CustomerSubTotalPreviewFunction(String stateName) {
-    this.stateName = stateName;
-    stateDescriptor = new ValueStateDescriptor<>(stateName, MonthlyCustomerSubTotal.class);
-  }
-
-  private final ValueStateDescriptor stateDescriptor;
+  private ValueStateDescriptor stateDescriptor;
   private ValueState<MonthlyCustomerSubTotal> state;
+
+  CustomerSubTotalPreviewFunction(Optional<String> stateName) {
+    queryable = stateName.isPresent();
+    if (queryable) {
+      this.stateName = stateName.get();
+      stateDescriptor = new ValueStateDescriptor<>(this.stateName, MonthlyCustomerSubTotal.class);
+    }
+  }
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    stateDescriptor.setQueryable(stateName);
-    state = getRuntimeContext().getState(stateDescriptor);
+    if (queryable) {
+      stateDescriptor.setQueryable(stateName);
+      state = getRuntimeContext().getState(stateDescriptor);
+    }
   }
 
   @Override
@@ -38,7 +46,9 @@ class CustomerSubTotalPreviewFunction
     Money amount = input.iterator().next();
     MonthlyCustomerSubTotal monthlySubtotal =
         new MonthlyCustomerSubTotal(customer, window.getStart() + " - " + window.getEnd(), amount);
-    state.update(monthlySubtotal);
+    if (queryable) {
+      state.update(monthlySubtotal);
+    }
     out.collect(monthlySubtotal);
   }
 }
