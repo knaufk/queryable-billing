@@ -10,7 +10,7 @@ import java.util.Properties;
 import java.util.Random;
 
 public class TestDataGenerator {
-  public static void main(String[] args) {
+  public static void main(String[] args) throws InterruptedException {
     Random random = new Random();
 
     Properties props = new Properties();
@@ -21,7 +21,9 @@ public class TestDataGenerator {
 
     List<String> customers = Lists.newArrayList("Anton", "Berta", "Charlie");
 
+
     for (int i = 0; i < 1000; i++) {
+      Thread.sleep(100);
       //TODO integrate event types
       //def types = BillableEvent.BillableEventType.values().toList()
       String customer = customers.get(random.nextInt(customers.size()));

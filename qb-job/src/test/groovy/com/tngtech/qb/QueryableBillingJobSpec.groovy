@@ -7,10 +7,13 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
 import org.apache.flink.streaming.api.windowing.time.Time
+import org.joda.money.CurrencyUnit
+import org.joda.money.Money
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
+import java.math.RoundingMode
 import java.nio.file.Files
 import java.util.stream.LongStream
 
@@ -53,17 +56,6 @@ class QueryableBillingJobSpec extends Specification {
         ["Anton", "Berta", "Charlie"].forEach({ assertThat(outputLines, hasItem(containsString(it))) })
     }
 
-    static class TestTimestampAssigner extends BoundedOutOfOrdernessTimestampExtractor<BillableEvent> {
-        TestTimestampAssigner(final Time maxOutOfOrderness) {
-            super(maxOutOfOrderness)
-        }
-
-        @Override
-        long extractTimestamp(final BillableEvent element) {
-            return element.getTimestampMs()
-        }
-    }
-
     private SingleOutputStreamOperator<BillableEvent> createTestSource() {
         def random = new Random();
         env.fromCollection(
@@ -71,11 +63,10 @@ class QueryableBillingJobSpec extends Specification {
                       .collect({
                 def customers = ["Anton", "Berta", "Charlie"]
                 def types = BillableEvent.BillableEventType.values().toList()
-                new BillableEvent().withEuroAmount(it)
-                        .withCustomer(customers.get(random.nextInt(customers.size())))
-                        .withEventType(types.get(random.nextInt(types.size()))
-                )
+                new BillableEvent(System.currentTimeMillis(),
+                        customers.get(random.nextInt(customers.size())),
+                        Money.of(CurrencyUnit.EUR, it, RoundingMode.UP),
+                        types.get(random.nextInt(types.size())) )
             }))
-           .assignTimestampsAndWatermarks(new TestTimestampAssigner(Time.seconds(1)))
     }
 }

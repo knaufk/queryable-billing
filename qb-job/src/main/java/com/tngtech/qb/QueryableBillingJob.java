@@ -42,7 +42,7 @@ public class QueryableBillingJob {
     this.parameters = parameters;
     env = executionEnvironment;
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-    env.enableCheckpointing(100);
+    env.enableCheckpointing(10000);
   }
 
   public static void main(String[] args) throws Exception {
@@ -51,8 +51,14 @@ public class QueryableBillingJob {
   }
 
   void run() throws Exception {
-    billableEvents().print();
-    process(billableEvents());
+    DataStream<BillableEvent> input = billableEvents().assignTimestampsAndWatermarks(
+            new BoundedOutOfOrdernessTimestampExtractor<BillableEvent>(Time.of(1, TimeUnit.SECONDS)) {
+              @Override
+              public long extractTimestamp(final BillableEvent element) {
+                return element.getTimestampMs();
+              }
+            });
+    process(input);
     env.execute("Queryable Billing Job");
   }
 
@@ -87,13 +93,7 @@ public class QueryableBillingJob {
                       }
                     })
             .returns(BillableEvent.class);
-    return events.assignTimestampsAndWatermarks(
-        new BoundedOutOfOrdernessTimestampExtractor<BillableEvent>(Time.of(1, TimeUnit.SECONDS)) {
-          @Override
-          public long extractTimestamp(final BillableEvent element) {
-            return element.getTimestampMs();
-          }
-        });
+    return events;
   }
 
   private void process(DataStream<BillableEvent> billableEvents) {
