@@ -7,21 +7,20 @@ The project consists of three components, the queryable Flink job (containing a 
 
 Manual Testing
 --------------
-1. Assemble all components:
+1. In the flink-contrib folder change the Flink Version in the Dockerfile to 1.2.0 and build the flink image tagging it flink:latest
+
+2. Build all DockerImages
     ```
-    ./gradlew qb-job:shadowJar qb-server:bootRepackage qb-data-generator:shadowJar
+    ./gradlew buildImage
     ```
-2. Start demo:
+3. Start demo:
     ```
-    ./demo.sh
+    docker-compose up -d
     ```
-3. Query state (using curl or Postman):
+4. Checkout Flink Dashboard <http://localhost:48081>    
+5. Query Service
     - <http://localhost:8080/customers/{customer}> (e.g. *Emma* or *Noah*)
     - <http://localhost:8080/types/{type}> (*MESSAGE*, *DATA*, *CALL*, *PACK*, *MISC*)
-4. When finished, shut down everyhting:
-    ```
-    ./cleanup_after_demo.sh
-    ```
     
 ### Server without Flink
 Alternatively, the server can be started standalone without Flink as a backend: 
@@ -33,7 +32,7 @@ java -jar -Dspring.profiles.active=standalone qb-server/build/libs/qb-server-0.1
 What's next
 -----------
 - [ ] Setup markdown in reveal.js 
-- [ ] Add 2nd taskmanager to docker setup @knaufk
+- [x] Add 2nd taskmanager to docker setup @knaufk
 - [ ] Dockerize frontend @knaufk
 - [ ] Improve invoice format
 - [ ] Data Generator should log what it's outputting (maybe sampled)

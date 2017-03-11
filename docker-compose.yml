@@ -23,6 +23,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker1:9092'
+      KAFKA_NUM_PARTITIONS: 18
 
   jobmanager:
     image: flink
@@ -50,13 +51,27 @@ services:
     environment:
       JOB_MANAGER_RPC_ADDRESS: 'jobmanager'
 
+  taskmanager2:
+    image: qb-job:0.1-SNAPSHOT
+    container_name: taskmanager2
+    expose:
+      - "6121"
+      - "6122"
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    volumes:
+      - ./build/invoices:/var/qb/invoices
+    environment:
+      JOB_MANAGER_RPC_ADDRESS: 'jobmanager'
+
   qb-job:
     image: qb-job:0.1-SNAPSHOT
     container_name: qb-job
     depends_on:
       - jobmanager
       - broker1
-    command: flink run --jobmanager jobmanager:6123 qb-job-0.1-SNAPSHOT-all.jar --output /var/qb/invoices --bootstrap-servers broker1:9092
+    command: flink run -p 6 --jobmanager jobmanager:6123 qb-job-0.1-SNAPSHOT-all.jar --output /var/qb/invoices --bootstrap-servers broker1:9092
 
   qb-data-generator:
     image: qb-data-generator:0.1-SNAPSHOT
