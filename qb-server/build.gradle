@@ -35,7 +35,7 @@ if (cert.exists()) {
 task createDockerfile(type: Dockerfile) {
     dependsOn bootRepackage
     destFile = project.file('build/Dockerfile')
-    from 'flink'
+    from 'qb-flink'
     addFile("resources/main/start.sh", ".")
     user("root")
     runCommand("chmod +x start.sh")

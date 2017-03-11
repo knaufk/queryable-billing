@@ -31,7 +31,7 @@ if (cert.exists()) {
 task createDockerfile(type: Dockerfile) {
     dependsOn shadowJar
     destFile = project.file('build/Dockerfile')
-    from 'flink'
+    from 'qb-flink'
     addFile("libs/${shadowJar.archiveName}", ".")
     user("root")
 }

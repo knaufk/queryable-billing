@@ -25,10 +25,10 @@ In *qb-frontend* sub-folder:
 npm build
 docker build . -t qb-frontend
 ```
-Additionally, you also need Flink, Kafka and Zookeeper containers. The latter two are on DockerHub. The Flink container also needs to be build manually as follows.
-
-*TODO*
-
+Additionally, you also need Flink, Kafka and Zookeeper containers. The latter two are on DockerHub. To build the Flink container run the following command in the *qb-flink* sub-folder
+```
+docker build . -t qb-flink
+```
 
 Run
 ---
@@ -57,7 +57,7 @@ What's next
 
 *Backend*
 - [x] Add 2nd taskmanager to docker setup @knaufk
-- [ ] Eigenes Flink Image
+- [x] Eigenes Flink Image
 - [ ] Improve invoice format
 - [ ] Data Generator should log what it's outputting (maybe sampled)
 - [ ] Increase event time speed in data generator, switch window size to 1 month
