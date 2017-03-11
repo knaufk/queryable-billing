@@ -88,3 +88,11 @@ services:
        - "8080:8080"
     depends_on:
        - qb-job
+
+  qb-frotend:
+    image: qb-frontend
+    container_name: qb-frontend
+    ports: 
+       - "8088:80"
+    depends_on: 
+       - qb-server

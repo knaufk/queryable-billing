@@ -13,6 +13,8 @@ Manual Testing
     ```
     ./gradlew buildImage
     ```
+    and 
+    `cd qb-frontend && npm build && docker build . -t qb-frontend`
 3. Start demo:
     ```
     docker-compose up -d
@@ -21,6 +23,8 @@ Manual Testing
 5. Query Service
     - <http://localhost:8080/customers/{customer}> (e.g. *Emma* or *Noah*)
     - <http://localhost:8080/types/{type}> (*MESSAGE*, *DATA*, *CALL*, *PACK*, *MISC*)
+6. Frontend
+    - 
     
 ### Server without Flink
 Alternatively, the server can be started standalone without Flink as a backend: 
@@ -31,9 +35,13 @@ java -jar -Dspring.profiles.active=standalone qb-server/build/libs/qb-server-0.1
 
 What's next
 -----------
+
+*Slides*
 - [ ] Setup markdown in reveal.js 
+
+*Backend*
 - [x] Add 2nd taskmanager to docker setup @knaufk
-- [ ] Dockerize frontend @knaufk
+- [ ] Eigenes Flink Image
 - [ ] Improve invoice format
 - [ ] Data Generator should log what it's outputting (maybe sampled)
 - [ ] Increase event time speed in data generator, switch window size to 1 month
@@ -45,4 +53,11 @@ What's next
 - [ ] JM HA, test job manager failures
 - [ ] Simulate downstream system failures
 - [ ] Expose metrics in job (for Flink Web UI)
-- [ ] investigate kryo serialization error, when jobs runs for a while ?
+
+*Frontend*
+- [x] Dockerize
+- [x] Replace setInterval by setTimeout. Cleanup Scheduling of AJAX calls.
+- [x] Colorful Failures/Success
+- [ ] Remove Links from Menu
+- [ ] Add month display
+- [ ] Stabilize timing of ajax calls

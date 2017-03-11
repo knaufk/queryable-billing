@@ -2,4 +2,5 @@
 .gradle/
 build/
 .gradletasknamecache
-qb-talk/node_modules
+node_modules/
+qb-frontend/public/dist
