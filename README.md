@@ -3,34 +3,50 @@ Queryable Billing
 
 This is a prototype on how to build a robust billing system using Apache Flink's Queryable State feature.
 
-The project consists of three components, the queryable Flink job (containing a Kafka source) and a Spring Boot application that can query the job for its internal state as well as a small jar that generates test data and produces to Kafka.
+The project consists of the following components
 
-Manual Testing
---------------
-1. In the flink-contrib folder change the Flink Version in the Dockerfile to 1.2.0 and build the flink image tagging it flink:latest
+* **qb-job:** A queryable Flink Job with a Kafka source and file sink.
+* **qb-server:** A small Spring Boot application, which is backed by the Flink's Queryable State and redirects request to the Flink job, such that the frontend clients do not have to deal with the the Queryable State Client directly.
+* **qb-data-generator:** A data generator producing billable events to a Kafka Queue.
+* **qb-frontend:** A small React/Redux application, which provides customers a web application to check there current monthly sub-total.
 
-2. Build all DockerImages
-    ```
-    ./gradlew buildImage
-    ```
-    and 
-    `cd qb-frontend && npm build && docker build . -t qb-frontend`
-3. Start demo:
-    ```
-    docker-compose up -d
-    ```
-4. Checkout Flink Dashboard <http://localhost:48081>    
-5. Query Service
+Build
+-----
+All of the above components run in their own Docker containers. To build the images run
+
+**qb-job, qb-server, qb-data-generator**
+```
+./gradlew buildimage
+```
+**qb-frotend**
+
+In *qb-frontend* sub-folder: 
+```
+npm build
+docker build . -t qb-frontend
+```
+Additionally, you also need Flink, Kafka and Zookeeper containers. The latter two are on DockerHub. The Flink container also needs to be build manually as follows.
+
+*TODO*
+
+
+Run
+---
+```
+docker-compose up -d
+```
+
+Verify
+------
+* Flink Dashboard 
+    - <http://localhost:48081>   
+* QB-Server
     - <http://localhost:8080/customers/{customer}> (e.g. *Emma* or *Noah*)
     - <http://localhost:8080/types/{type}> (*MESSAGE*, *DATA*, *CALL*, *PACK*, *MISC*)
-6. Frontend
-    - 
-    
-### Server without Flink
-Alternatively, the server can be started standalone without Flink as a backend: 
-```
-java -jar -Dspring.profiles.active=standalone qb-server/build/libs/qb-server-0.1-SNAPSHOT.jar 
-```
+* QB-Frontend    
+    - <http://localhost:8088
+* File Output
+    - `build/invoices/*` (Docker Volume mounted into the TaskManagers)
 
 
 What's next
