@@ -1,3 +1,5 @@
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
 buildscript {
     repositories {
         maven {
@@ -6,7 +8,8 @@ buildscript {
     }
     dependencies {
         classpath('com.diffplug.gradle.spotless:spotless:2.4.1',
-                'com.github.jengelman.gradle.plugins:shadow:1.2.4')
+                'com.github.jengelman.gradle.plugins:shadow:1.2.4',
+                'com.bmuschko:gradle-docker-plugin:3.0.6')
     }
 }
 

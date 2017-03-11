@@ -1,6 +1,11 @@
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+
 plugins {
     id 'org.springframework.boot' version '1.4.3.RELEASE'
 }
+
+apply plugin: 'com.bmuschko.docker-remote-api'
 
 dependencies {
     configurations.all {
@@ -18,4 +23,25 @@ dependencies {
 
 bootRepackage {
     mainClass = 'com.tngtech.qb.QueryableBillingServer'
+}
+
+task createDockerfile(type: Dockerfile) {
+    dependsOn bootRepackage
+    destFile = project.file('build/Dockerfile')
+    from 'flink'
+    addFile("resources/main/start.sh", ".")
+    user("root")
+    runCommand("chmod +x start.sh")
+    addFile("libs/${project.name}-${project.version}.jar", ".")
+    defaultCommand("./start.sh")
+}
+
+docker{
+    certPath = new File(System.properties['user.home'], '.docker/machine/machines/default')
+}
+
+task buildImage(type: DockerBuildImage) {
+    dependsOn createDockerfile
+    inputDir = createDockerfile.destFile.parentFile
+    tag = "${project.name}:${project.version}"
 }

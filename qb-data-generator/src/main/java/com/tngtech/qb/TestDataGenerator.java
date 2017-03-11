@@ -16,17 +16,18 @@ public class TestDataGenerator {
 
   public static void main(String[] args) throws InterruptedException {
     final Integer delay;
-    if (args.length != 1) {
+    final String bootstrapServers = args[0];
+    if (args.length != 2) {
       System.out.println(
           "Using default delay of 10ms, to use another value, give it as first argument.");
       delay = 10;
     } else {
-      delay = Integer.valueOf(args[0]);
+      delay = Integer.valueOf(args[1]);
     }
 
     Random random = new Random();
 
-    Producer<String, String> producer = createKafkaProducer();
+    Producer<String, String> producer = createKafkaProducer(bootstrapServers);
 
     List<String> customers =
         Lists.newArrayList(
@@ -58,9 +59,9 @@ public class TestDataGenerator {
     producer.close();
   }
 
-  private static Producer<String, String> createKafkaProducer() {
+  private static Producer<String, String> createKafkaProducer(final String bootstrapServers) {
     Properties props = new Properties();
-    props.put("bootstrap.servers", "localhost:9092");
+    props.put("bootstrap.servers", bootstrapServers);
     props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
     props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
     return new KafkaProducer<>(props);

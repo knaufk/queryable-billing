@@ -3,6 +3,7 @@ version: '2'
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:3.2.0
+    container_name: zookeeper
     hostname: zookeeper
     ports:
       - "2181:2181"
@@ -12,6 +13,7 @@ services:
 
   broker1:
     image: confluentinc/cp-kafka:3.2.0
+    container_name: broker1
     hostname: broker1
     depends_on:
       - zookeeper
@@ -24,39 +26,50 @@ services:
 
   jobmanager:
     image: flink
-    container_name: "jobmanager"
+    container_name: jobmanager
+    hostname: jobmanager
     expose:
       - "6123"
     ports:
       - "48081:8081"
-    networks:
-      appnetwork:
-        ipv4_address: "172.16.238.11"
     command: jobmanager
     environment:
-      - JOB_MANAGER_RPC_ADDRESS="jobmanager"
+      JOB_MANAGER_RPC_ADDRESS: 'jobmanager'
 
   taskmanager1:
-    image: flink
+    image: qb-job:0.1-SNAPSHOT
+    container_name: taskmanager1
     expose:
       - "6121"
       - "6122"
-    networks:
-      appnetwork:
-        ipv4_address: "172.16.238.12"
     depends_on:
       - jobmanager
     command: taskmanager
-    links:
-      - "jobmanager:jobmanager"
+    volumes:
+      - ./build/invoices:/var/qb/invoices
     environment:
-      - JOB_MANAGER_RPC_ADDRESS="jobmanager"
+      JOB_MANAGER_RPC_ADDRESS: 'jobmanager'
 
-networks:
-  appnetwork:
-    ipam:
-      driver:
-        default
-      config:
-      - subnet: "172.16.238.0/24"
-        gateway: "172.16.238.1"
+  qb-job:
+    image: qb-job:0.1-SNAPSHOT
+    container_name: qb-job
+    depends_on:
+      - jobmanager
+      - broker1
+    command: flink run --jobmanager jobmanager:6123 qb-job-0.1-SNAPSHOT-all.jar --output /var/qb/invoices --bootstrap-servers broker1:9092
+
+  qb-data-generator:
+    image: qb-data-generator:0.1-SNAPSHOT
+    container_name: qb-data-generator
+    depends_on:
+      - broker1
+    command: java -jar qb-data-generator-0.1-SNAPSHOT-all.jar broker1:9092
+
+
+  qb-server:
+    image: qb-server:0.1-SNAPSHOT
+    container_name: qb-server
+    ports:
+       - "8080:8080"
+    depends_on:
+       - qb-job

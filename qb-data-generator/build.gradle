@@ -1,5 +1,9 @@
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+
 apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.bmuschko.docker-remote-api'
 
 dependencies {
     compile(project(':qb-common'),
@@ -10,4 +14,21 @@ shadowJar {
     manifest {
         attributes 'Main-Class': 'com.tngtech.qb.TestDataGenerator'
     }
+}
+
+task createDockerfile(type: Dockerfile) {
+    dependsOn shadowJar
+    destFile = project.file('build/Dockerfile')
+    from 'java:8-jre-alpine'
+    addFile("libs/${shadowJar.archiveName}", ".")
+}
+
+docker{
+    certPath = new File(System.properties['user.home'], '.docker/machine/machines/default')
+}
+
+task buildImage(type: DockerBuildImage) {
+    dependsOn createDockerfile
+    inputDir = createDockerfile.destFile.parentFile
+    tag = "${project.name}:${project.version}"
 }
