@@ -25,6 +25,13 @@ bootRepackage {
     mainClass = 'com.tngtech.qb.QueryableBillingServer'
 }
 
+def cert = new File(System.properties['user.home'], '.docker/machine/machines/default')
+if (cert.exists()) {
+    docker{
+        certPath = cert
+    }
+}
+
 task createDockerfile(type: Dockerfile) {
     dependsOn bootRepackage
     destFile = project.file('build/Dockerfile')
@@ -36,12 +43,9 @@ task createDockerfile(type: Dockerfile) {
     defaultCommand("./start.sh")
 }
 
-docker{
-    certPath = new File(System.properties['user.home'], '.docker/machine/machines/default')
-}
-
 task buildImage(type: DockerBuildImage) {
     dependsOn createDockerfile
     inputDir = createDockerfile.destFile.parentFile
     tag = "${project.name}:${project.version}"
 }
+

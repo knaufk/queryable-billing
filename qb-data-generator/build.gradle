@@ -23,8 +23,12 @@ task createDockerfile(type: Dockerfile) {
     addFile("libs/${shadowJar.archiveName}", ".")
 }
 
-docker{
-    certPath = new File(System.properties['user.home'], '.docker/machine/machines/default')
+
+def cert = new File(System.properties['user.home'], '.docker/machine/machines/default')
+if (cert.exists()) {
+    docker{
+        certPath = cert
+    }
 }
 
 task buildImage(type: DockerBuildImage) {

@@ -21,16 +21,19 @@ shadowJar {
     }
 }
 
+def cert = new File(System.properties['user.home'], '.docker/machine/machines/default')
+if (cert.exists()) {
+    docker{
+        certPath = cert
+    }
+}
+
 task createDockerfile(type: Dockerfile) {
     dependsOn shadowJar
     destFile = project.file('build/Dockerfile')
     from 'flink'
     addFile("libs/${shadowJar.archiveName}", ".")
     user("root")
-}
-
-docker{
-    certPath = new File(System.properties['user.home'], '.docker/machine/machines/default')
 }
 
 task buildImage(type: DockerBuildImage) {
