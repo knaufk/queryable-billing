@@ -32,8 +32,14 @@ java -jar -Dspring.profiles.active=standalone qb-server/build/libs/qb-server-0.1
 
 What's next
 -----------
-- [x] Data generator jar (10 hardcoded names, runs to eternity, delay configurable)
-- [x] create infrastructure for distributed tests (e.g. YARN via docker or vagrant, ...) -> script für cluster (1JM, 1TM , zookeeper, kafka, job, server, data generator)
+- [ ] Setup markdown in reveal.js 
+- [ ] Add 2nd taskmanager to docker setup @knaufk
+- [ ] Dockerize frontend @knaufk
+- [ ] Improve invoice format
+- [ ] Data Generator should log what it's outputting (maybe sampled)
+- [ ] Increase event time speed in data generator, switch window size to 1 month
+- [ ] which state is actually queried in case there is more than one window
+- [ ] make data generator deterministic (should add up to fixed amount per month)
 - [ ] Reactivate event types and include in Kafka serialization
 - [ ] create Splunk Setup (Management Dashboard per type), see <http://blogs.splunk.com/2013/06/18/getting-data-from-your-rest-apis-into-splunk/> (alternatively investigate [simple-json-datasource](https://github.com/grafana/simple-json-datasource) Grafana plugin for management dashboard)
 - [ ] Checkpointing, test task manager failures
