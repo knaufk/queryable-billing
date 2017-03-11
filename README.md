@@ -59,7 +59,7 @@ What's next
 - [x] Add 2nd taskmanager to docker setup @knaufk
 - [x] Eigenes Flink Image
 - [ ] Improve invoice format
-- [ ] Data Generator should log what it's outputting (maybe sampled)
+- [x] Data Generator should log what it's outputting (maybe sampled)
 - [ ] Increase event time speed in data generator, switch window size to 1 month
 - [ ] which state is actually queried in case there is more than one window
 - [ ] make data generator deterministic (should add up to fixed amount per month)
