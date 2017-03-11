@@ -2,3 +2,4 @@
 .gradle/
 build/
 .gradletasknamecache
+qb-talk/node_modules

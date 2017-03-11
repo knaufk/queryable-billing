@@ -1,0 +1,12 @@
+{
+	  "name": "my-presentation",
+	    "version": "0.1.0",
+	      "description": "tbd",
+	        "author": "tbd",
+		  "scripts": {
+			      "start": "node node_modules/tng-reveal-template/src/server/server.js"
+			        },
+				  "dependencies": {
+					      "tng-reveal-template": "git+ssh://git@bitbucket.int.tngtech.com:122/rpt/presentation-template.git"
+					        }
+						}
