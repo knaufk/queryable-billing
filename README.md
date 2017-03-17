@@ -12,6 +12,10 @@ The project consists of the following components
 
 Build
 -----
+First of all, you need Flink, Kafka and Zookeeper containers. The latter two are on DockerHub. To build the Flink container run the following command in the *qb-flink* sub-folder
+```
+docker build . -t qb-flink
+```
 All of the above components run in their own Docker containers. To build the images run
 
 **qb-job, qb-server, qb-data-generator**
@@ -24,10 +28,6 @@ In *qb-frontend* sub-folder:
 ```
 npm build
 docker build . -t qb-frontend
-```
-Additionally, you also need Flink, Kafka and Zookeeper containers. The latter two are on DockerHub. To build the Flink container run the following command in the *qb-flink* sub-folder
-```
-docker build . -t qb-flink
 ```
 
 Run
@@ -44,7 +44,7 @@ Verify
     - <http://localhost:8080/customers/{customer}> (e.g. *Emma* or *Noah*)
     - <http://localhost:8080/types/{type}> (*MESSAGE*, *DATA*, *CALL*, *PACK*, *MISC*)
 * QB-Frontend    
-    - <http://localhost:8088
+    - <http://localhost:8088>
 * File Output
     - `build/invoices/*` (Docker Volume mounted into the TaskManagers)
 
