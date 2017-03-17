@@ -35,7 +35,8 @@ public class QueryableBillingJob {
   private final StreamExecutionEnvironment env;
   private final ParameterTool parameters;
 
-  private static final Time ONE_MONTH = Time.seconds(5);
+  //TODO go to real months
+  private static final Time ONE_MONTH = Time.days(30);
 
   QueryableBillingJob(
       final StreamExecutionEnvironment executionEnvironment, ParameterTool parameters) {
@@ -104,6 +105,7 @@ public class QueryableBillingJob {
     sumUp(windowByCustomer(billableEvents), Optional.empty())
         .addSink(
             new BucketingSink<MonthlyCustomerSubTotal>(parameters.getRequired("output"))
+                .setBucketer(new MonthBucketer())
                 .setInactiveBucketCheckInterval(10)
                 .setInactiveBucketThreshold(10))
         .name("Create Final Invoices");

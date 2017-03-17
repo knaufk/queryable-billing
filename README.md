@@ -58,11 +58,11 @@ What's next
 *Backend*
 - [x] Add 2nd taskmanager to docker setup @knaufk
 - [x] Eigenes Flink Image
-- [ ] Improve invoice format
 - [x] Data Generator should log what it's outputting (maybe sampled)
 - [ ] Increase event time speed in data generator, switch window size to 1 month
-- [ ] which state is actually queried in case there is more than one window
 - [ ] make data generator deterministic (should add up to fixed amount per month)
+- [ ] Improve invoice format
+- [ ] which state is actually queried in case there is more than one window?
 - [ ] Reactivate event types and include in Kafka serialization
 - [ ] create Splunk Setup (Management Dashboard per type), see <http://blogs.splunk.com/2013/06/18/getting-data-from-your-rest-apis-into-splunk/> (alternatively investigate [simple-json-datasource](https://github.com/grafana/simple-json-datasource) Grafana plugin for management dashboard)
 - [ ] Checkpointing, test task manager failures
@@ -74,6 +74,7 @@ What's next
 - [x] Dockerize
 - [x] Replace setInterval by setTimeout. Cleanup Scheduling of AJAX calls.
 - [x] Colorful Failures/Success
+- [ ] Investigate why frontend is not displayed on Mac
 - [ ] Remove Links from Menu
 - [ ] Add month display
 - [ ] Stabilize timing of ajax calls

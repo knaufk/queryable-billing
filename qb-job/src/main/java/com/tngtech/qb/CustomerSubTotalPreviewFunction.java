@@ -8,12 +8,15 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 import org.joda.money.Money;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 
 class CustomerSubTotalPreviewFunction
     extends RichWindowFunction<Money, MonthlyCustomerSubTotal, String, TimeWindow> {
 
   private final boolean queryable;
+  private final SimpleDateFormat dateFormatter;
 
   private String stateName;
   private ValueStateDescriptor stateDescriptor;
@@ -25,6 +28,7 @@ class CustomerSubTotalPreviewFunction
       this.stateName = stateName.get();
       stateDescriptor = new ValueStateDescriptor<>(this.stateName, MonthlyCustomerSubTotal.class);
     }
+    dateFormatter = new SimpleDateFormat("yyyy-MM");
   }
 
   @Override
@@ -44,8 +48,9 @@ class CustomerSubTotalPreviewFunction
       final Collector<MonthlyCustomerSubTotal> out)
       throws Exception {
     Money amount = input.iterator().next();
-    MonthlyCustomerSubTotal monthlySubtotal =
-        new MonthlyCustomerSubTotal(customer, window.getStart() + " - " + window.getEnd(), amount);
+    String month = dateFormatter.format(new Date(window.getStart()));
+
+    MonthlyCustomerSubTotal monthlySubtotal = new MonthlyCustomerSubTotal(customer, month, amount);
     if (queryable) {
       state.update(monthlySubtotal);
     }
