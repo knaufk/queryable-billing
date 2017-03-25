@@ -97,7 +97,7 @@ public class TestDataGenerator {
           System.out.println(formatForPrinting(monthlyEvent));
         }
 
-        Thread.sleep(DELAY_PER_MONTH/monthlyEvents.size());
+        Thread.sleep(DELAY_PER_MONTH / monthlyEvents.size());
       }
 
       month++;
