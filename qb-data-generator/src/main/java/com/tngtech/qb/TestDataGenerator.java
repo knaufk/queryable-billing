@@ -8,6 +8,8 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
+import org.joda.money.format.MoneyFormatter;
+import org.joda.money.format.MoneyFormatterBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -20,6 +22,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.DAYS;
+import static org.joda.money.format.MoneyAmountStyle.ASCII_DECIMAL_POINT_NO_GROUPING;
 
 public class TestDataGenerator {
   private static final List<String> CUSTOMERS =
@@ -44,6 +47,8 @@ public class TestDataGenerator {
 
   private static Random random = new Random();
   private static DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("YYYY-MM-dd HH:mm");
+  private static MoneyFormatter moneyFormatter =
+      new MoneyFormatterBuilder().appendAmount(ASCII_DECIMAL_POINT_NO_GROUPING).toFormatter();
 
   public static void main(String[] args) throws InterruptedException {
     final String bootstrapServers = args[0];
@@ -54,7 +59,6 @@ public class TestDataGenerator {
 
     int month = 0;
     while (true) {
-      Thread.sleep(DELAY_PER_MONTH);
       final long beginningOfMonth = month * DAYS.toMillis(30);
       final long endOfMonth = beginningOfMonth + DAYS.toMillis(30);
 
@@ -90,13 +94,12 @@ public class TestDataGenerator {
 
         //Write 10% of Records to stdout for demo
         if (random.nextFloat() < 0.1) {
-          final String nextTimePretty =
-              new DateTime(monthlyEvent.getTimestampMs()).toString(timeFormatter);
-          System.out.println(formatForOutput(monthlyEvent));
+          System.out.println(formatForPrinting(monthlyEvent));
         }
       }
 
       month++;
+      Thread.sleep(DELAY_PER_MONTH);
     }
   }
 
@@ -105,7 +108,16 @@ public class TestDataGenerator {
         .join(
             event.getTimestampMs(),
             event.getCustomer(),
-            event.getAmount().getAmountMajor() + "." + event.getAmount().getAmountMinorInt(),
+            moneyFormatter.print(event.getAmount()),
+            event.getType());
+  }
+
+  private static String formatForPrinting(final BillableEvent event) {
+    return Joiner.on(",")
+        .join(
+            new DateTime(event.getTimestampMs()).toString(timeFormatter),
+            event.getCustomer(),
+            event.getAmount(),
             event.getType());
   }
 

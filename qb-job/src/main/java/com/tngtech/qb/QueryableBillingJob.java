@@ -35,7 +35,6 @@ public class QueryableBillingJob {
   private final StreamExecutionEnvironment env;
   private final ParameterTool parameters;
 
-  //TODO go to real months
   private static final Time ONE_MONTH = Time.days(30);
 
   QueryableBillingJob(
