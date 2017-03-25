@@ -96,10 +96,11 @@ public class TestDataGenerator {
         if (random.nextFloat() < 0.1) {
           System.out.println(formatForPrinting(monthlyEvent));
         }
+
+        Thread.sleep(DELAY_PER_MONTH/monthlyEvents.size());
       }
 
       month++;
-      Thread.sleep(DELAY_PER_MONTH);
     }
   }
 
