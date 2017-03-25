@@ -38,7 +38,7 @@ function getTimeParsed() {
     return time;
 }
 export function receiveSubtotal(subscriber, json) {
-        return {type: RECEIVE_SUBTOTAL, subscriber: subscriber, total: json.totalEur, status: "Success", time: getTimeParsed() }
+        return {type: RECEIVE_SUBTOTAL, subscriber: subscriber, total: json.totalEur, month: json.month, status: "Success", time: getTimeParsed() }
 }
 
 export function failedReceiveSubtotal(subscriber) {
@@ -52,7 +52,12 @@ export function fetchSubtotal(subscriber) {
         dispatch(requestSubtotal(subscriber))
 
         return fetch("http://localhost:8080/customers/" + subscriber)
-            .then(response => response.json())
+            .then(function(response) {
+                if (response.status >= 400 && response.status < 600) {
+                    throw new Error("Bad response from server");
+                }
+                return response.json();
+            })
             .then(json =>
                 dispatch(receiveSubtotal(subscriber, json))
             )

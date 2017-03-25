@@ -1,13 +1,14 @@
 import { combineReducers } from 'redux'
 import { CHANGE_SUBSCRIBER, FETCH_SUBTOTAL, RECEIVE_SUBTOTAL, FAILED_RECEIVE_SUBTOTAL} from './actions'
 
-function state(state = {subscriber: "Paul", total: "-", isFetching: false, lastFetch: {status: 'Success', time: 'Not fetched yet.'}, }, action) {
+function state(state = {subscriber: "Emma", total: "-", month: "-", isFetching: false, lastFetch: {status: 'Success', time: 'Not fetched yet.'}, }, action) {
 
     switch (action.type) {
         case CHANGE_SUBSCRIBER:
             return Object.assign({}, state, {
                 subscriber: action.subscriber,
                 total: "-",
+                month: "-",
                 lastFetch: {status: 'Success', time: 'Not fetched yet.'}
             })
         case FETCH_SUBTOTAL:
@@ -19,6 +20,7 @@ function state(state = {subscriber: "Paul", total: "-", isFetching: false, lastF
                 return Object.assign({}, state, {
                     isFetching: false,
                     total: action.total,
+                    month: action.month,
                     lastFetch: {status: action.status, time: action.time}
                 })
             } else {

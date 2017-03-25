@@ -1,8 +1,7 @@
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { fetchSubtotal } from '../core/actions'
-import s from './status.css';
-
+import s from './custom.css'
 class LiveTotalDisplay extends React.Component {
 
     constructor(props) {
@@ -38,8 +37,7 @@ class LiveTotalDisplay extends React.Component {
 
         return (
             <div>
-                <h4>{this.props.subscriber}</h4>
-                <h3>€ {this.props.total}</h3>
+                <h4>€ {this.props.total}</h4>
                 <div className={statusClassName}>{this.props.lastFetchTime}</div>
             </div>
         );
@@ -47,8 +45,8 @@ class LiveTotalDisplay extends React.Component {
 }
 
 LiveTotalDisplay.propTypes = {
-    total: PropTypes.string.isRequired,
     subscriber: PropTypes.string.isRequired,
+    total: PropTypes.string.isRequired,
     lastFetchStatus: PropTypes.string.isRequired,
     lastFetchTime: PropTypes.string.isRequired,
     isFetching: PropTypes.bool.isRequired,
@@ -61,12 +59,12 @@ const mapStateToProps = (state) => {
         lastFetchStatus: state.lastFetch.status,
         lastFetchTime: state.lastFetch.time,
         isFetching: state.isFetching,
-        total: state.total
+        total: state.total,
     }
 }
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => {
-    const { subscriber,total,isFetching, lastFetchStatus,lastFetchTime } = stateProps;
+    const { subscriber, total, isFetching, lastFetchStatus,lastFetchTime } = stateProps;
     const { dispatch } = dispatchProps;
     return {
         subscriber,

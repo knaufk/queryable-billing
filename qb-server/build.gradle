@@ -39,6 +39,7 @@ task createDockerfile(type: Dockerfile) {
     addFile("resources/main/start.sh", ".")
     user("root")
     runCommand("chmod +x start.sh")
+    user("flink")
     addFile("libs/${project.name}-${project.version}.jar", ".")
     defaultCommand("./start.sh")
 }
