@@ -32,9 +32,9 @@ public class MonthlySubTotal<T> {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(month);
-    sb.append(":\t");
+    sb.append("\t");
     sb.append(basis);
-    sb.append(": ");
+    sb.append("\t ");
     sb.append(total);
     return sb.toString();
   }

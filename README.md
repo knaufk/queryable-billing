@@ -26,7 +26,7 @@ All of the above components run in their own Docker containers. To build the ima
 
 In *qb-frontend* sub-folder: 
 ```
-npm build
+node run build
 docker build . -t qb-frontend
 ```
 
