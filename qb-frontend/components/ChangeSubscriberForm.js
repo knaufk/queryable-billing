@@ -18,6 +18,7 @@ class ChangeSubscriberForm extends React.Component {
                         return
                     }
                     this.props.onClick(input.value)
+                    input.value = ''
                 }}>
 
                     <div className="mdl-textfield mdl-js-textfield">
