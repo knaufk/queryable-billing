@@ -1,63 +1,190 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 
-<head>
-    <meta charset="utf-8">
+    <head>
+        <meta charset="utf-8">
 
-    <title>How to Build a Billing System without a Database</title>
+        <title>Queryable Billing</title>
 
-    <meta name="description" content="How to Build a Billing System without a Database">
-    <meta name="author" content="Maximilian Bode, Konstantin Knauf">
+        <meta name="description" content="How to Build a Billing System without a Database">
+        <meta name="author" content="Maximilian Bode, Konstantin Knauf">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <link rel="stylesheet" href="css/reveal.min.css">
+        <link rel="stylesheet" href="css/theme/tng.css" id="theme">
+        <link rel="stylesheet" href="css/custom.css">
+        <link rel="stylesheet" href="lib/css/github.css">
 
-    <link rel="stylesheet" href="node_modules/tng-reveal-template/style/presentation.css">
-    <link rel="stylesheet" href="custom.css">
-    <script src="node_modules/tng-reveal-template/src/client/presentation.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">-->
-</head>
-
-<body class="charred auto-fragment">
-
-<div class="i18n">
-    <span class="section-overview">Overview</span>
-</div>
-
-<section data-markdown>
-    <script type="text/template">
-        ## How to Build a Billing System Without a Database
-        [Maximilian Bode](mailto:maximilian.bode@tngtech.com),
-        [Konstantin Knauf](mailto:konstantin.knauf@tngtech.com)
-
-        ![](img/tng.svg) <!-- .element: class="logo" -->
-    </script>
-</section>
+        <link rel="stylesheet" href="custom.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
 
 
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
 
-<section>
-    <section>
-        <h2>?</h2>
-        <table class="contacts">
-            <tr>
-                <td><i class="fa fa-envelope" aria-hidden="true"></i></td>
-                <td><a href="mailto:maximilian.bode@tng.tech">maximilian.bode@tng.tech</a></td>
-                <td><i class="fa fa-envelope" aria-hidden="true"></i></td>
-                <td><a href="mailto:konstantin.knauf@tng.tech">konstantin.knauf@tng.tech</a></td>
-            </tr>
-            <tr>
-                <td><i class="fa fa-linkedin" aria-hidden="true"></i></td>
-                <td><a href="http://lnked.in/maxbode">lnked.in/maxbode</a></td>
-                <td><i class="fa fa-twitter" aria-hidden="true"></i></td>
-                <td><a href="https://twitter.com/snntrable">@snntrable</a></td>
-            </tr>
-        </table>
-        <br/>
-        <a href="http://www.tngtech.com"><img class="logo" src="img/tng.svg"></a>
-    </section>
-</section>
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
 
-</body>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+                <section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-separator-notes="^\n\[\[">
+                    <script type="text/template">
+## How to Build a Billing System without a Database
+
+[Maximilian Bode](mailto:maximilian.bode@tngtech.com),
+[Konstantin Knauf](mailto:konstantin.knauf@tngtech.com)
+
+--
+
+## Who are we?
+
+[[
+* I am a note.
+* Me too.
+
+--
+
+## Motivation (Why this talk/project?) @Max
+
+---
+
+## Queryable State
+
+--
+
+### Evolution of Streaming Architecture @Max
+
+--
+
+### High - Level Architecture @Konstantin
+
+---
+
+## Use Case
+
+--
+
+### Requirements @Konstantin
+
+--
+
+#### Functional
+*Sketch
+
+--
+
+#### Non-Functional
+
+--
+
+#### Design/Jobgraph/Connectors @Max
+
+---
+
+## Demo
+
+### Good Case 1 (No Queryable State)
+* Different Job?
+
+--
+
+### Good Case 2 (Queryable State)
+* Final Job
+
+--
+
+### Taskmanager Failure
+
+--
+
+### Jobmanager Failure
+
+--
+
+### Failure of Downstream Systems
+
+---
+
+## Current limitations, outlook
+                    </script>
+                </section>
+                <section>
+                    <section>
+                        <h2>?</h2>
+                        <table class="contacts">
+                            <tr>
+                                <td><i class="fa fa-envelope" aria-hidden="true"></i></td>
+                                <td><a href="mailto:maximilian.bode@tng.tech">maximilian.bode@tng.tech</a></td>
+                                <td><i class="fa fa-envelope" aria-hidden="true"></i></td>
+                                <td><a href="mailto:konstantin.knauf@tng.tech">konstantin.knauf@tng.tech</a></td>
+                            </tr>
+                            <tr>
+                                <td><i class="fa fa-linkedin" aria-hidden="true"></i></td>
+                                <td><a href="http://lnked.in/maxbode">lnked.in/maxbode</a></td>
+                                <td><i class="fa fa-twitter" aria-hidden="true"></i></td>
+                                <td><a href="https://twitter.com/snntrable">@snntrable</a></td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <a href="http://www.tngtech.com"><img class="logo" src="img/tng.svg"></a>
+                    </section>
+                </section>
+            </div>
+
+            </div>
+           <p class="copyright">© TNG Technology Consulting 2011 - 2017</p>
+        </div>
+
+        <script src="lib/js/head.js"></script>
+        <script src="js/vendor/reveal.js"></script>
+
+        <script>
+            // Full list of configuration options available at:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+                rollingLinks: false,
+                width: 1024,
+                height: 768,
+
+                transition: 'slide', // none/fade/slide/convex/concave/zoom linear?
+
+                markdown: {
+                   smartypants: true
+                },
+
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js' },
+                    { src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() {
+                        hljs.initHighlightingOnLoad();
+                        Array.prototype.forEach.call(document.querySelectorAll('pre>code'), function(node) {
+                            var text = node.innerHTML;
+
+                            text = text.replace(/\^([0-9]+)\^(((?!\^\^)(.|\n))*)\^\^/g, '<span class="fragment highlight" data-fragment-index="$1">$2</span>');
+                            text = text.replace(/\^\^(((?!\^\^)(.|\n))*)\^\^/g, '<span class="highlight">$1</span>');
+
+                            node.innerHTML = text;
+                        });
+                    } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+                    { src: 'plugin/notes/notes.js', async: true }
+                ]
+            });
+        </script>
+
+    </body>
 </html>

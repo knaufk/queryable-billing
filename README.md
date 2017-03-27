@@ -43,7 +43,7 @@ Verify
 * QB-Server
     - <http://localhost:8080/customers/{customer}> (e.g. *Emma* or *Noah*)
     - <http://localhost:8080/types/{type}> (*MESSAGE*, *DATA*, *CALL*, *PACK*, *MISC*)
-* QB-Frontend    
+* QB-Frontend
     - <http://localhost:8088>
 * File Output
     - `build/invoices/*` (Docker Volume mounted into the TaskManagers)
@@ -53,7 +53,7 @@ What's next
 -----------
 
 *Slides*
-- [ ] Setup markdown in reveal.js 
+- [x] Setup markdown in reveal.js 
 
 *Backend*
 - [x] Add 2nd taskmanager to docker setup @knaufk
