@@ -25,6 +25,7 @@ import static java.util.concurrent.TimeUnit.DAYS;
 import static org.joda.money.format.MoneyAmountStyle.ASCII_DECIMAL_POINT_NO_GROUPING;
 
 public class TestDataGenerator {
+  //TODO map mit verschiedenen amounts
   private static final List<String> CUSTOMERS =
       ImmutableList.of(
           "Emma",
@@ -59,7 +60,7 @@ public class TestDataGenerator {
 
     int month = 0;
     while (true) {
-      final long beginningOfMonth = month * DAYS.toMillis(30);
+      final long beginningOfMonth = month * DAYS.toMillis(30); //TODO nicht am epoch ursprung anfangen
       final long endOfMonth = beginningOfMonth + DAYS.toMillis(30);
 
       List<BillableEvent> monthlyEvents = Lists.newArrayList();

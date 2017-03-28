@@ -1,5 +1,6 @@
 ---
 version: '2'
+
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:3.2.0
@@ -25,57 +26,72 @@ services:
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker1:9092'
       KAFKA_NUM_PARTITIONS: 18
 
-  jobmanager:
+  jobmanager1:
     image: qb-flink
     build: ./qb-flink
-    container_name: jobmanager
-    hostname: jobmanager
+    container_name: jobmanager1
+    hostname: jobmanager1
+    depends_on:
+      - zookeeper
     expose:
       - "6123"
     ports:
       - "48081:8081"
     command: jobmanager
-    environment:
-      JOB_MANAGER_RPC_ADDRESS: 'jobmanager'
+    volumes:
+      - recovery:/var/qb/recovery
+
+  jobmanager2:
+    image: qb-flink
+    build: ./qb-flink
+    container_name: jobmanager2
+    hostname: jobmanager2
+    depends_on:
+      - zookeeper
+    expose:
+      - "6123"
+    ports:
+      - "58081:8081"
+    command: jobmanager
+    volumes:
+      - recovery:/var/qb/recovery
 
   taskmanager1:
-    image: qb-job:0.1-SNAPSHOT
+    image: qb-flink
     build: ./qb-job/build
     container_name: taskmanager1
     expose:
       - "6121"
       - "6122"
     depends_on:
-      - jobmanager
+      - jobmanager1
+      - zookeeper
     command: taskmanager
     volumes:
       - ./build/invoices:/var/qb/invoices
-    environment:
-      JOB_MANAGER_RPC_ADDRESS: 'jobmanager'
 
   taskmanager2:
-    image: qb-job:0.1-SNAPSHOT
+    image: qb-flink
     build: ./qb-job/build
     container_name: taskmanager2
     expose:
       - "6121"
       - "6122"
     depends_on:
-      - jobmanager
+      - jobmanager1
+      - zookeeper
     command: taskmanager
     volumes:
       - ./build/invoices:/var/qb/invoices
-    environment:
-      JOB_MANAGER_RPC_ADDRESS: 'jobmanager'
 
   qb-job:
     image: qb-job:0.1-SNAPSHOT
     build: ./qb-job/build
     container_name: qb-job
     depends_on:
-      - jobmanager
+      - jobmanager1
       - broker1
-    command: flink run -p 6 --jobmanager jobmanager:6123 qb-job-0.1-SNAPSHOT-all.jar --output /var/qb/invoices --bootstrap-servers broker1:9092
+    command: flink run -p 6 qb-job-0.1-SNAPSHOT-all.jar --output /var/qb/invoices --bootstrap-servers broker1:9092
 
   qb-data-generator:
     image: qb-data-generator:0.1-SNAPSHOT
@@ -98,7 +114,10 @@ services:
     image: qb-frontend
     build: ./qb-frontend
     container_name: qb-frontend
-    ports: 
+    ports:
        - "8088:80"
-    depends_on: 
+    depends_on:
        - qb-server
+
+volumes:
+  recovery:

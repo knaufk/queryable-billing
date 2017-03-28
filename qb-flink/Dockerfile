@@ -53,6 +53,8 @@ RUN set -x && \
 # Configure container
 USER flink
 ADD flink-conf.yaml $FLINK_HOME/conf
+ADD masters $FLINK_HOME/conf
 ADD docker-entrypoint.sh $FLINK_HOME/bin/
+USER root
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["sh", "-c"]
