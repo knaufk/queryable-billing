@@ -60,7 +60,8 @@ public class TestDataGenerator {
 
     int month = 0;
     while (true) {
-      final long beginningOfMonth = month * DAYS.toMillis(30); //TODO nicht am epoch ursprung anfangen
+      final long beginningOfMonth =
+          month * DAYS.toMillis(30); //TODO nicht am epoch ursprung anfangen
       final long endOfMonth = beginningOfMonth + DAYS.toMillis(30);
 
       List<BillableEvent> monthlyEvents = Lists.newArrayList();
