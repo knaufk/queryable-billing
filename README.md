@@ -64,7 +64,7 @@ What's next
 - [x] Improve invoice format
 - [ ] Add more realistic event time skew and lateness
 - [ ] which state is actually queried in case there is more than one window?
-- [ ] Reactivate event types and include in Kafka serialization
+- [x] Reactivate event types and include in Kafka serialization
 - [ ] create Splunk Setup (Management Dashboard per type), see <http://blogs.splunk.com/2013/06/18/getting-data-from-your-rest-apis-into-splunk/> (alternatively investigate [simple-json-datasource](https://github.com/grafana/simple-json-datasource) Grafana plugin for management dashboard)
 - [x] Checkpointing, test task manager failures
 - [ ] JM HA, test job manager failures

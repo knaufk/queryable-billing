@@ -29,6 +29,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import static com.tngtech.qb.Constants.PER_EVENT_TYPE_STATE_NAME;
+import static org.joda.money.CurrencyUnit.*;
 
 public class QueryableBillingJob {
 
@@ -77,17 +78,14 @@ public class QueryableBillingJob {
         .flatMap(
             (FlatMapFunction<String, BillableEvent>)
                 (value, out) -> {
-                  try {
                     final String[] fields = value.split(",");
                     out.collect(
                         new BillableEvent(
                             Long.valueOf(fields[0]),
                             fields[1],
-                            Money.of(CurrencyUnit.EUR, Double.valueOf(fields[2]), RoundingMode.UP),
+                            Money.of(EUR, Double.valueOf(fields[2]), RoundingMode.UP),
                             BillableEvent.BillableEventType.valueOf(fields[3].toUpperCase())));
-                  } catch (Exception e) {
-                    e.printStackTrace();
-                  }
+
                 })
         .returns(BillableEvent.class);
   }
@@ -96,8 +94,7 @@ public class QueryableBillingJob {
     outputFinalInvoice(billableEvents);
 
     exposeQueryableCustomerPreviews(billableEvents);
-    //TODO key group problem
-    //exposeQueryableTypePreviews(billableEvents);
+    exposeQueryableTypePreviews(billableEvents);
   }
 
   private void outputFinalInvoice(final DataStream<BillableEvent> billableEvents) {
@@ -119,29 +116,26 @@ public class QueryableBillingJob {
   private WindowedStream<BillableEvent, BillableEventType, TimeWindow> windowByType(
       final DataStream<BillableEvent> billableEvents) {
     return billableEvents
-        .keyBy((KeySelector<BillableEvent, BillableEventType>) BillableEvent::getType)
+        .keyBy(BillableEvent::getType)
         .window(TumblingEventTimeWindows.of(ONE_MONTH))
-        .allowedLateness(Time.of(2, TimeUnit.SECONDS));
+        .allowedLateness(Time.of(3, TimeUnit.DAYS));
   }
 
   private WindowedStream<BillableEvent, String, TimeWindow> windowByCustomer(
       DataStream<BillableEvent> billableEvents) {
     return billableEvents
-        .keyBy((KeySelector<BillableEvent, String>) BillableEvent::getCustomer)
+        .keyBy(BillableEvent::getCustomer)
         .window(TumblingEventTimeWindows.of(ONE_MONTH))
-        .allowedLateness(Time.of(2, TimeUnit.SECONDS));
+        .allowedLateness(Time.of(3, TimeUnit.DAYS));
   }
 
   private void exposeQueryableTypePreviews(final DataStream<BillableEvent> billableEvents) {
     windowByType(billableEvents)
         .trigger(CountTrigger.of(1))
         .fold(
-            Money.zero(CurrencyUnit.EUR),
-            (FoldFunction<BillableEvent, Money>)
+            Money.zero(EUR),
                 (accumulator, value) -> accumulator.plus(value.getAmount()),
-            new EventTypeSubTotalPreviewFunction(PER_EVENT_TYPE_STATE_NAME),
-            TypeInformation.of(new TypeHint<Money>() {}),
-            TypeInformation.of(new TypeHint<MonthlyEventTypeSubTotal>() {}))
+            new EventTypeSubTotalPreviewFunction(PER_EVENT_TYPE_STATE_NAME))
         .name("Individual Sums for each EventType per Payment Period");
   }
 
@@ -149,11 +143,9 @@ public class QueryableBillingJob {
       WindowedStream<BillableEvent, String, TimeWindow> windowed, Optional<String> stateName) {
     return windowed
         .fold(
-            Money.zero(CurrencyUnit.EUR),
+            Money.zero(EUR),
             (accumulator, value) -> accumulator.plus(value.getAmount()),
-            new CustomerSubTotalPreviewFunction(stateName),
-            TypeInformation.of(new TypeHint<Money>() {}),
-            TypeInformation.of(new TypeHint<MonthlyCustomerSubTotal>() {}))
+            new CustomerSubTotalPreviewFunction(stateName))
         .name("Individual Sums for each Customer per Payment Period");
   }
 }

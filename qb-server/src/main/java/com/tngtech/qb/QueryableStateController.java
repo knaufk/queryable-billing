@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.tngtech.qb.BillableEvent.*;
+
 @RestController
 @CrossOrigin
 public class QueryableStateController {
@@ -39,7 +41,7 @@ public class QueryableStateController {
   public MonthlyEventTypeSubTotalResponse queryByType(@PathVariable String type) {
     try {
       return new MonthlyEventTypeSubTotalResponse(
-          queryService.findOne(BillableEvent.BillableEventType.valueOf(type.toUpperCase())));
+          queryService.findOne(BillableEventType.valueOf(type.toUpperCase())));
     } catch (IllegalArgumentException e) {
       throw new QueryNotPossibleException("The supplied type \"" + type + "\" does not exist.");
     } catch (Exception e) {
