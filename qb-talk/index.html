@@ -65,7 +65,11 @@
 
 --
 
-### High - Level Architecture @Konstantin
+### Flink's Implementation
+
+#### Basic Flow
+
+<img src="img/QueryableStateFlow.svg" width="1000">
 
 ---
 
@@ -73,16 +77,30 @@
 
 --
 
-### Requirements @Konstantin
+### Functional Requirements
+
+![Use Case](img/qb-sketch-640x420.png "Queryable Billing")
+
+[[
+
+#### User Stories
+
+* As the invoicing system I want to receive the total amount due at the end of each month, so that I can issue correct invoices to each customer.
+* As a postpaid customer I want to be able check my current amount due during the month so that I can adjust my usage behaviour accordingly.
+* As a marketing manager I want to know how much money my customers are currently spending on the different types of products to make real-time adjustments to my campaigns.
 
 --
 
-#### Functional
-*Sketch
+### Non-Functional Requirements
 
---
-
-#### Non-Functional
+* Completeness & Correctness
+* Scalability
+* Availability
+* Robustness
+    * Out-of-Order-Events
+    * Late Arriving Events
+    * Variable Volume
+    * Partial Failures
 
 --
 
@@ -92,13 +110,17 @@
 
 ## Demo
 
+--
+
+### Docker Setup?
+
+--
+
 ### Good Case 1 (No Queryable State)
-* Different Job?
 
 --
 
 ### Good Case 2 (Queryable State)
-* Final Job
 
 --
 
