@@ -1,0 +1,22 @@
+body .reveal .slides section .fragment.visible {
+   opacity: 0.3; }
+body .reveal .slides section .fragment.visible.no-burn,
+body .reveal .slides section .fragment.visible.current-fragment,
+body .reveal .slides section .fragment.highlight,
+body .reveal .slides section .highlight:not(.fragment) {
+   opacity: 1;
+   visibility: visible; }
+body .reveal .slides section .fragment.highlight.current-fragment,
+body .reveal .slides section .highlight:not(.fragment) {
+   background-color: yellow;
+   border-radius: 4px; }
+
+p.copyright {
+  position: fixed;
+  bottom: 10px;
+  left: 15px;
+  color: #888;
+  z-index: 3;
+  margin: 0;
+  font-size: 0.5em;
+}
