@@ -47,13 +47,25 @@
 
 ## Who are we?
 
+<img src="img/konstantin.jpg" height="300">
+<img src="img/max.jpg" height="300">
+
+<img src="img/tng.png" width="300">
+
+
 [[
-* I am a note.
-* Me too.
+* TNG Technology Consulting, a Munich-based consulting firm focused on high-end information technology
+* both currently on a project with one of Europe’s largest telecommunications providers
+* built a platform processing billions of events per day
 
 --
 
-## Motivation (Why this talk/project?) @Max
+## Why this talk?
+
+[[
+* deal a lot with stream processing, excited about Flink
+* stumbled across use case that made sense to implement using queryable state
+* happy to share our prototype today
 
 ---
 
@@ -61,7 +73,13 @@
 
 --
 
-### Evolution of Streaming Architecture @Max
+### Evolution of Streaming Architecture
+* Lambda Architecture
+* External Key-Value Store
+* Fault-tolerant Stream Processor
+
+[[
+TODO
 
 --
 
@@ -104,7 +122,21 @@
 
 --
 
-#### Design/Jobgraph/Connectors @Max
+#### Design/Jobgraph/Connectors
+
+* Flink Job
+    * Kafka Source
+    * TimeWindows
+        * Aggregation
+        * Queryable State
+    * BucketingSink
+* Spring Boot Server
+    * QueryableStateClient
+* Frontend
+
+[[
+TODO idea: qb-sketch here again, logos (Flink, Spring Boot, React/Redux, Kafka, HDFS) appear one after the other
+* exactly-once for invoices
 
 ---
 
@@ -141,7 +173,6 @@
                 </section>
                 <section>
                     <section>
-                        <h2>?</h2>
                         <table class="contacts">
                             <tr>
                                 <td><i class="fa fa-envelope" aria-hidden="true"></i></td>
@@ -157,7 +188,7 @@
                             </tr>
                         </table>
                         <br/>
-                        <a href="http://www.tngtech.com"><img class="logo" src="img/tng.svg"></a>
+                        <a href="http://www.tngtech.com"><img class="logo" src="img/tng.png" width="300"></a>
                     </section>
                 </section>
             </div>
