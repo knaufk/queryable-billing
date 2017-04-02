@@ -30,7 +30,7 @@ public class QueryableStateController {
   public MonthlyCustomerSubTotalResponse queryByCustomer(@PathVariable String customer) {
     try {
       LOGGER.info("Querying for customer {}", customer);
-      return new MonthlyCustomerSubTotalResponse(queryService.findOne(customer));
+      return new MonthlyCustomerSubTotalResponse(queryService.queryCustomer(customer));
     } catch (Exception e) {
       LOGGER.error("Error querying customer", e);
       throw new QueryNotPossibleException(customer);
@@ -40,10 +40,7 @@ public class QueryableStateController {
   @RequestMapping(path = "/types/{type}", method = RequestMethod.GET)
   public MonthlyEventTypeSubTotalResponse queryByType(@PathVariable String type) {
     try {
-      return new MonthlyEventTypeSubTotalResponse(
-          queryService.findOne(BillableEventType.valueOf(type.toUpperCase())));
-    } catch (IllegalArgumentException e) {
-      throw new QueryNotPossibleException("The supplied type \"" + type + "\" does not exist.");
+      return new MonthlyEventTypeSubTotalResponse(queryService.queryType(type.toUpperCase()));
     } catch (Exception e) {
       LOGGER.error("Error querying type", e);
       throw new QueryNotPossibleException(type);

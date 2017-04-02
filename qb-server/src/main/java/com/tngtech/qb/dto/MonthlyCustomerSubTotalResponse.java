@@ -1,9 +1,8 @@
 package com.tngtech.qb.dto;
 
-import com.tngtech.qb.MonthlyCustomerSubTotal;
+import com.tngtech.qb.MonthlySubtotalByCategory;
 
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 
 public class MonthlyCustomerSubTotalResponse {
   private final String customer;
@@ -19,8 +18,8 @@ public class MonthlyCustomerSubTotalResponse {
     this.totalEur = totalEur;
   }
 
-  public MonthlyCustomerSubTotalResponse(MonthlyCustomerSubTotal subTotal) {
-    customer = subTotal.getBasis();
+  public MonthlyCustomerSubTotalResponse(MonthlySubtotalByCategory subTotal) {
+    customer = subTotal.getCategory();
     month = dateFormatter.format(Long.parseLong(subTotal.getMonth()));
     totalEur = subTotal.getTotal().getAmount().toString();
   }

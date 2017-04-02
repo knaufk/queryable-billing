@@ -18,15 +18,14 @@ public class StandaloneStateQueryService implements StateQueryService {
   private Map<String, Money> subTotals = Maps.newConcurrentMap();
 
   @Override
-  public MonthlyCustomerSubTotal findOne(final String customer) throws Exception {
+  public MonthlySubtotalByCategory queryCustomer(final String customer) throws Exception {
     Money total = subTotals.getOrDefault(customer, Money.of(CurrencyUnit.EUR, 0.0));
     subTotals.put(customer, total.plusMinor(rnd.nextInt(500)));
-    return new MonthlyCustomerSubTotal(customer, "someMonth", total);
+    return new MonthlySubtotalByCategory(customer, "someMonth", total);
   }
 
   @Override
-  public MonthlyEventTypeSubTotal findOne(final BillableEvent.BillableEventType type)
-      throws Exception {
-    return new MonthlyEventTypeSubTotal(type, "someMonth", Money.of(CurrencyUnit.EUR, 10.12));
+  public MonthlySubtotalByCategory queryType(final String type) throws Exception {
+    return new MonthlySubtotalByCategory(type, "someMonth", Money.of(CurrencyUnit.EUR, 10.12));
   }
 }

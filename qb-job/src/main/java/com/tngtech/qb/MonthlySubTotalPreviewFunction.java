@@ -10,20 +10,20 @@ import org.joda.money.Money;
 
 import java.util.Optional;
 
-class CustomerSubTotalPreviewFunction
-    extends RichWindowFunction<Money, MonthlyCustomerSubTotal, String, TimeWindow> {
+class MonthlySubTotalPreviewFunction
+    extends RichWindowFunction<Money, MonthlySubtotalByCategory, String, TimeWindow> {
 
   private final boolean queryable;
 
   private String stateName;
   private ValueStateDescriptor stateDescriptor;
-  private ValueState<MonthlyCustomerSubTotal> state;
+  private ValueState<MonthlySubtotalByCategory> state;
 
-  CustomerSubTotalPreviewFunction(Optional<String> stateName) {
+  MonthlySubTotalPreviewFunction(Optional<String> stateName) {
     queryable = stateName.isPresent();
     if (queryable) {
       this.stateName = stateName.get();
-      stateDescriptor = new ValueStateDescriptor<>(this.stateName, MonthlyCustomerSubTotal.class);
+      stateDescriptor = new ValueStateDescriptor<>(this.stateName, MonthlySubtotalByCategory.class);
     }
   }
 
@@ -41,12 +41,13 @@ class CustomerSubTotalPreviewFunction
       final String customer,
       final TimeWindow window,
       final Iterable<Money> input,
-      final Collector<MonthlyCustomerSubTotal> out)
+      final Collector<MonthlySubtotalByCategory> out)
       throws Exception {
     Money amount = input.iterator().next();
     String month = String.valueOf(window.getStart());
 
-    MonthlyCustomerSubTotal monthlySubtotal = new MonthlyCustomerSubTotal(customer, month, amount);
+    MonthlySubtotalByCategory monthlySubtotal =
+        new MonthlySubtotalByCategory(customer, month, amount);
     if (queryable) {
       state.update(monthlySubtotal);
     }

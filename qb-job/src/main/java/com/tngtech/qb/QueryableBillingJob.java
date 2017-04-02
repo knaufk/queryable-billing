@@ -1,12 +1,7 @@
 package com.tngtech.qb;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.tngtech.qb.BillableEvent.BillableEventType;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.FoldFunction;
-import org.apache.flink.api.common.typeinfo.TypeHint;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -20,7 +15,6 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.fs.bucketing.BucketingSink;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
-import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
 import java.math.RoundingMode;
@@ -28,6 +22,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import static com.tngtech.qb.Constants.PER_CUSTOMER_STATE_NAME;
 import static com.tngtech.qb.Constants.PER_EVENT_TYPE_STATE_NAME;
 import static org.joda.money.CurrencyUnit.*;
 
@@ -78,14 +73,13 @@ public class QueryableBillingJob {
         .flatMap(
             (FlatMapFunction<String, BillableEvent>)
                 (value, out) -> {
-                    final String[] fields = value.split(",");
-                    out.collect(
-                        new BillableEvent(
-                            Long.valueOf(fields[0]),
-                            fields[1],
-                            Money.of(EUR, Double.valueOf(fields[2]), RoundingMode.UP),
-                            BillableEvent.BillableEventType.valueOf(fields[3].toUpperCase())));
-
+                  final String[] fields = value.split(",");
+                  out.collect(
+                      new BillableEvent(
+                          Long.valueOf(fields[0]),
+                          fields[1],
+                          Money.of(EUR, Double.valueOf(fields[2]), RoundingMode.UP),
+                          BillableEvent.BillableEventType.valueOf(fields[3].toUpperCase())));
                 })
         .returns(BillableEvent.class);
   }
@@ -100,7 +94,7 @@ public class QueryableBillingJob {
   private void outputFinalInvoice(final DataStream<BillableEvent> billableEvents) {
     sumUp(windowByCustomer(billableEvents), Optional.empty())
         .addSink(
-            new BucketingSink<MonthlyCustomerSubTotal>(parameters.getRequired("output"))
+            new BucketingSink<MonthlySubtotalByCategory>(parameters.getRequired("output"))
                 .setBucketer(new MonthBucketer())
                 .setInactiveBucketCheckInterval(10)
                 .setInactiveBucketThreshold(10))
@@ -110,13 +104,14 @@ public class QueryableBillingJob {
   private void exposeQueryableCustomerPreviews(final DataStream<BillableEvent> billableEvents) {
     final WindowedStream<BillableEvent, String, TimeWindow> eventsSoFar =
         windowByCustomer(billableEvents).trigger(CountTrigger.of(1));
-    sumUp(eventsSoFar, Optional.of(Constants.PER_CUSTOMER_STATE_NAME));
+    sumUp(eventsSoFar, Optional.of(PER_CUSTOMER_STATE_NAME));
   }
 
-  private WindowedStream<BillableEvent, BillableEventType, TimeWindow> windowByType(
+  private WindowedStream<BillableEvent, String, TimeWindow> windowByType(
       final DataStream<BillableEvent> billableEvents) {
+
     return billableEvents
-        .keyBy(BillableEvent::getType)
+        .keyBy(event -> event.getType().toString())
         .window(TumblingEventTimeWindows.of(ONE_MONTH))
         .allowedLateness(Time.of(3, TimeUnit.DAYS));
   }
@@ -134,18 +129,18 @@ public class QueryableBillingJob {
         .trigger(CountTrigger.of(1))
         .fold(
             Money.zero(EUR),
-                (accumulator, value) -> accumulator.plus(value.getAmount()),
-            new EventTypeSubTotalPreviewFunction(PER_EVENT_TYPE_STATE_NAME))
+            (accumulator, value) -> accumulator.plus(value.getAmount()),
+            new MonthlySubTotalPreviewFunction(Optional.of(PER_EVENT_TYPE_STATE_NAME)))
         .name("Individual Sums for each EventType per Payment Period");
   }
 
-  private DataStream<MonthlyCustomerSubTotal> sumUp(
+  private DataStream<MonthlySubtotalByCategory> sumUp(
       WindowedStream<BillableEvent, String, TimeWindow> windowed, Optional<String> stateName) {
     return windowed
         .fold(
             Money.zero(EUR),
             (accumulator, value) -> accumulator.plus(value.getAmount()),
-            new CustomerSubTotalPreviewFunction(stateName))
+            new MonthlySubTotalPreviewFunction(stateName))
         .name("Individual Sums for each Customer per Payment Period");
   }
 }

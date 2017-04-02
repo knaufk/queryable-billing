@@ -4,20 +4,20 @@ import org.joda.money.Money;
 
 import java.util.Objects;
 
-public class MonthlySubTotal<T> {
+public class MonthlySubtotalByCategory {
 
-  private final T basis;
+  private final String category;
   private final String month;
   private final Money total;
 
-  public MonthlySubTotal(final T basis, String month, final Money total) {
-    this.basis = basis;
+  public MonthlySubtotalByCategory(final String category, String month, final Money total) {
+    this.category = category;
     this.month = month;
     this.total = total;
   }
 
-  public T getBasis() {
-    return basis;
+  public String getCategory() {
+    return category;
   }
 
   public Money getTotal() {
@@ -33,7 +33,7 @@ public class MonthlySubTotal<T> {
     StringBuilder sb = new StringBuilder();
     sb.append(month);
     sb.append("\t");
-    sb.append(basis);
+    sb.append(category);
     sb.append("\t ");
     sb.append(total);
     return sb.toString();
@@ -47,14 +47,14 @@ public class MonthlySubTotal<T> {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    final MonthlySubTotal that = (MonthlySubTotal) o;
-    return Objects.equals(basis, that.basis)
+    final MonthlySubtotalByCategory that = (MonthlySubtotalByCategory) o;
+    return Objects.equals(category, that.category)
         && Objects.equals(month, that.month)
         && Objects.equals(total, that.total);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(basis, month, total);
+    return Objects.hash(category, month, total);
   }
 }

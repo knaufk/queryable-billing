@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface StateQueryService {
 
-  MonthlyCustomerSubTotal findOne(String customer) throws Exception;
+  MonthlySubtotalByCategory queryCustomer(String customer) throws Exception;
 
-  MonthlyEventTypeSubTotal findOne(BillableEvent.BillableEventType type) throws Exception;
+  MonthlySubtotalByCategory queryType(String type) throws Exception;
 }
