@@ -5,15 +5,23 @@ apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'com.bmuschko.docker-remote-api'
 
+ext.sfl4jVersion = '1.7.21'
+ext.log4jVersion = '2.8.1'
+
 dependencies {
-    compile(project(':qb-common'),
-            'org.apache.kafka:kafka-clients:0.10.0.1',
-            'joda-time:joda-time:2.9.7')
+
+    compile "org.slf4j:slf4j-api:${sfl4jVersion}"
+    compile "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    compile "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+    compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+    compile 'org.apache.kafka:kafka-clients:0.10.0.1'
+    compile 'joda-time:joda-time:2.9.7'
+    compile project(':qb-common')
 }
 
 shadowJar {
     manifest {
-        attributes 'Main-Class': 'com.tngtech.qb.TestDataGenerator'
+        attributes 'Main-Class': 'com.tngtech.qb.BillableEventGenerator'
     }
 }
 

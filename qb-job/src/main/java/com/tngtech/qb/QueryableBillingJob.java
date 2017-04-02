@@ -51,7 +51,7 @@ public class QueryableBillingJob {
         billableEvents()
             .assignTimestampsAndWatermarks(
                 new BoundedOutOfOrdernessTimestampExtractor<BillableEvent>(
-                    Time.of(1, TimeUnit.SECONDS)) {
+                    Time.of(12, TimeUnit.HOURS)) {
                   @Override
                   public long extractTimestamp(final BillableEvent element) {
                     return element.getTimestampMs();
