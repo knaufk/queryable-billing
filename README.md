@@ -20,7 +20,7 @@ All of the above components run in their own Docker containers. To build the ima
 
 **qb-job, qb-server, qb-data-generator**
 ```
-./gradlew buildimage
+./gradlew buildImage
 ```
 **qb-frotend**
 
