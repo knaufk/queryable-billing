@@ -18,6 +18,6 @@ public class MonthBucketer implements Bucketer<MonthlySubtotalByCategory> {
   @Override
   public Path getBucketPath(
       final Clock clock, final Path basePath, final MonthlySubtotalByCategory element) {
-    return new Path(basePath + "/" + element.getMonth());
+    return new Path(basePath + "/" + element.getFormattedMonth());
   }
 }

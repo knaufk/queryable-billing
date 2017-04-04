@@ -9,14 +9,7 @@ public class MonthlyEventTypeSubTotalResponse {
   private final String month;
   private final String totalEur;
 
-  SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM yy");
-
-  public MonthlyEventTypeSubTotalResponse(
-      final String type, final String month, final String totalEur) {
-    this.type = type;
-    this.month = month;
-    this.totalEur = totalEur;
-  }
+  private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM");
 
   public MonthlyEventTypeSubTotalResponse(MonthlySubtotalByCategory subTotal) {
     type = subTotal.getCategory();

@@ -9,7 +9,7 @@ public class MonthlyCustomerSubTotalResponse {
   private final String month;
   private final String totalEur;
 
-  SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM yy");
+  private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM");
 
   public MonthlyCustomerSubTotalResponse(
       final String customer, final String month, final String totalEur) {

@@ -10,7 +10,7 @@ public class MonthlySubtotalByCategory {
   private final String category;
   private final String month;
   private final Money total;
-  private SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM yy");
+  private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM");
   ;
 
   public MonthlySubtotalByCategory(final String category, String month, final Money total) {
@@ -31,11 +31,15 @@ public class MonthlySubtotalByCategory {
     return month;
   }
 
+  public String getFormattedMonth() {
+    return dateFormatter.format(Long.parseLong(month));
+  }
+
   @Override
   public String toString() {
 
     StringBuilder sb = new StringBuilder();
-    sb.append(dateFormatter.format(Long.parseLong(month)));
+    sb.append(getFormattedMonth());
     sb.append("\t");
     sb.append(category);
     sb.append("\t ");
