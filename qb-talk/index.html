@@ -38,19 +38,22 @@
             <div class="slides">
                 <section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-separator-notes="^\n\[\[">
                     <script type="text/template">
-## How to Build a Billing System without a Database
+# Queryable Billing
+
+&nbsp;
 
 [Maximilian Bode](mailto:maximilian.bode@tngtech.com),
 [Konstantin Knauf](mailto:konstantin.knauf@tngtech.com)
 
+<img src="img/tng.png" width="300">
+
 --
 
-## Who are we?
+## Introduction
 
 <img src="img/konstantin.jpg" height="300">
 <img src="img/max.jpg" height="300">
 
-<img src="img/tng.png" width="300">
 
 
 [[
@@ -60,12 +63,11 @@
 
 --
 
-## Why this talk?
+## Agenda
 
 [[
-* deal a lot with stream processing, excited about Flink
-* stumbled across use case that made sense to implement using queryable state
-* happy to share our prototype today
+
+<!--TODO Hier sollte aus das "Focus of the Talk rein". Hab nochmal überlegt, und ich glaube wir sollten es am Anfang direkt bei der Agenda sagen und nicht mittendrin.-->
 
 ---
 
@@ -83,9 +85,7 @@ TODO
 
 --
 
-### Flink's Implementation
-
-#### Basic Flow
+### High Level Implementation
 
 <img src="img/QueryableStateFlow.svg" width="1000">
 
@@ -95,13 +95,13 @@ TODO
 
 --
 
-### Functional Requirements
+### Requirements
+
+--
 
 ![Use Case](img/qb-sketch-640x420.png "Queryable Billing")
 
 [[
-
-#### User Stories
 
 * As the invoicing system I want to receive the total amount due at the end of each month, so that I can issue correct invoices to each customer.
 * As a postpaid customer I want to be able check my current amount due during the month so that I can adjust my usage behaviour accordingly.
@@ -109,8 +109,10 @@ TODO
 
 --
 
-### Non-Functional Requirements
 
+![Use Case](img/nfa.svg "Queryable Billing")
+
+[[
 * Completeness & Correctness
 * Scalability
 * Availability
@@ -122,7 +124,7 @@ TODO
 
 --
 
-#### Design/Jobgraph/Connectors
+### Design/Jobgraph/Connectors
 
 * Flink Job
     * Kafka Source
@@ -144,15 +146,40 @@ TODO idea: qb-sketch here again, logos (Flink, Spring Boot, React/Redux, Kafka, 
 
 --
 
-### Docker Setup?
+### Invoice Generation
 
 --
 
-### Good Case 1 (No Queryable State)
+| Requirement   || Demo |
+| ------------- ||:----:|
+| Invoices      ||  <i class="fa fa-check new" aria-hidden="true"></i> |
+| Live Updates  || |
+| Correctness   ||  <span class="new">(<i class="fa fa-check" aria-hidden="true"></i>)</span>  |
+| Availability  || |
+| Scalability   || -|
+| Robustness    |Late Events|  <i class="fa fa-check new" aria-hidden="true"></i> |
+|               |Taskmanager| |
+|               |Jobmanager | |
+|               |Sink       | |
+
 
 --
 
-### Good Case 2 (Queryable State)
+### Live Updates
+
+--
+
+| Requirement   || Demo |
+| ------------- ||:----:|
+| Invoices      ||  <i class="fa fa-check" aria-hidden="true"></i> |
+| Live Updates  ||  <i class="fa fa-check new" aria-hidden="true"></i>|
+| Correctness   ||  (<i class="fa fa-check" aria-hidden="true"></i>)|
+| Availability  || |
+| Scalability   || -|
+| Robustness    |Late Events|  <i class="fa fa-check" aria-hidden="true"></i> |
+|               |Taskmanager| |
+|               |Jobmanager | |
+|               |Sink       | |
 
 --
 
@@ -160,19 +187,64 @@ TODO idea: qb-sketch here again, logos (Flink, Spring Boot, React/Redux, Kafka, 
 
 --
 
+| Requirement   || Demo |
+| ------------- ||:----:|
+| Invoices      ||  <i class="fa fa-check" aria-hidden="true"></i> |
+| Live Updates  ||  <i class="fa fa-check" aria-hidden="true"></i>|
+| Correctness   ||  (<i class="fa fa-check" aria-hidden="true"></i>)|
+| Availability  || <span class="new">(<i class="fa fa-check new" aria-hidden="true"></i>)</span>|
+| Scalability   || -|
+| Robustness    |Late Events| <i class="fa fa-check" aria-hidden="true"></i> |
+|               |Taskmanager| <i class="fa fa-check new" aria-hidden="true"></i> |
+|               |Jobmanager | |
+|               |Sink       | |
+
+--
+
 ### Jobmanager Failure
+
+--
+
+| Requirement   || Demo |
+| ------------- ||:----:|
+| Invoices      ||  <i class="fa fa-check" aria-hidden="true"></i> |
+| Live Updates  ||  <i class="fa fa-check" aria-hidden="true"></i>|
+| Correctness   ||  (<i class="fa fa-check" aria-hidden="true"></i>)|
+| Availability  || (<i class="fa fa-check" aria-hidden="true"></i>)|
+| Scalability   || -|
+| Robustness    |Late Events| <i class="fa fa-check" aria-hidden="true"></i> |
+|               |Taskmanager| <i class="fa fa-check" aria-hidden="true"></i> |
+|               |Jobmanager | <i class="fa fa-check new" aria-hidden="true"></i> |
+|               |Sink       | |
 
 --
 
 ### Failure of Downstream Systems
 
+--
+
+| Requirement   || Demo |
+| ------------- ||:----:|
+| Invoices      ||  <i class="fa fa-check" aria-hidden="true"></i> |
+| Live Updates  ||  <i class="fa fa-check" aria-hidden="true"></i>|
+| Correctness   ||  <i class="fa fa-check new" aria-hidden="true"></i>|
+| Availability  || <span class="new">(</span>(<i class="fa fa-check" aria-hidden="true"></i>)<span class="new">)</span>|
+| Scalability   || -|
+| Robustness    |Late Events| <i class="fa fa-check" aria-hidden="true"></i> |
+|               |Taskmanager| <i class="fa fa-check" aria-hidden="true"></i> |
+|               |Jobmanager | <i class="fa fa-check" aria-hidden="true"></i> |
+|               |Sink       | <i class="fa fa-check new" aria-hidden="true"></i> |
+
 ---
 
-## Current limitations, outlook
+## Limitations & Outlook
+
+* Native support for Queryable State in windows <!-- .element: class="fragment" -->
+* Improvements of client API <!-- .element: class="fragment" -->
+* Availability in case of Job failures <!-- .element: class="fragment" -->
 
 
-
-                    </script>
+</script>
                 </section>
                 <section>
                     <section>

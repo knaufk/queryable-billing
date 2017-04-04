@@ -8,3 +8,7 @@ table.contacts th, table.contacts td {
 .reveal section img {
     box-shadow: 0 0 0px
 }
+
+.new {
+    color: green;
+}
