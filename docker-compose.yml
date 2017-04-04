@@ -103,6 +103,7 @@ services:
     container_name: qb-data-generator
     depends_on:
       - broker1
+      - qb-job
     command: java -jar qb-data-generator-0.1-SNAPSHOT-all.jar broker1:9092
 
   qb-server:
