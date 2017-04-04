@@ -2,6 +2,7 @@ package com.tngtech.qb;
 
 import org.joda.money.Money;
 
+import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 public class MonthlySubtotalByCategory {
@@ -9,6 +10,8 @@ public class MonthlySubtotalByCategory {
   private final String category;
   private final String month;
   private final Money total;
+  private SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM yy");
+  ;
 
   public MonthlySubtotalByCategory(final String category, String month, final Money total) {
     this.category = category;
@@ -30,8 +33,9 @@ public class MonthlySubtotalByCategory {
 
   @Override
   public String toString() {
+
     StringBuilder sb = new StringBuilder();
-    sb.append(month);
+    sb.append(dateFormatter.format(Long.parseLong(month)));
     sb.append("\t");
     sb.append(category);
     sb.append("\t ");

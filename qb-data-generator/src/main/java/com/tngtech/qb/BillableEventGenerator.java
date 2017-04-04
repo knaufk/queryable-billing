@@ -1,7 +1,6 @@
 package com.tngtech.qb;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.tngtech.qb.BillableEvent.BillableEventType;
@@ -17,6 +16,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class BillableEventGenerator {
           .put("Olivia", 8000)
           .put("Sophia", 12000)
           .put("Ava", 6000)
-          .put("Isabella", 2000)
+          .put("Isa", 2000)
           .put("Noah", 20000)
           .put("William", 25000)
           .put("Liam", 3000)
@@ -48,73 +48,88 @@ public class BillableEventGenerator {
           .build();
 
   private static final int DELAY_PER_MONTH = 30_000;
-  private static final int EVENTS_PER_CUSTOMER_AND_MONTH = 1000;
+  private static final int EVENTS_PER_CUSTOMER_AND_MONTH = 10_000;
+
   public static final long MAX_OUT_OF_ORDERNESS = HOURS.toMillis(12);
+  public static final float OUT_OF_ORDERNESS_COEFFICIENT = 0.1f;
+
+  public static final long MAX_LATENESS = DAYS.toMillis(3);
+  public static final float LATENESS_COEFFICIENT = 0.1f;
 
   private static Random random = new Random();
   private static DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("YYYY-MM-dd HH:mm");
   private static MoneyFormatter moneyFormatter =
       new MoneyFormatterBuilder().appendAmount(ASCII_DECIMAL_POINT_NO_GROUPING).toFormatter();
-  public static final List<BillableEventType> BILLABLE_EVENT_TYPES =
-      Lists.newArrayList(BillableEventType.values());
+  public static final List<BillableEventType> BILLABLE_EVENT_TYPES = Lists.newArrayList(BillableEventType.values());
 
   public static void main(String[] args) throws InterruptedException {
 
-    final String bootstrapServers = args[0];
+   final String bootstrapServers = args[0];
 
     final Producer<String, String> producer = createKafkaProducer(bootstrapServers);
 
-    int month = 0;
+    int year = 0;
     while (true) {
 
-      final long startOfMonth = month * DAYS.toMillis(30);
-      final long endOfMonth = startOfMonth + DAYS.toMillis(30);
-      LOGGER.info("Starting Month: {} - {}", startOfMonth, endOfMonth);
+      final long startOfYear = year * DAYS.toMillis(360);
 
-      List<BillableEvent> eventsThisMonth = getSortedEventsForMonth(startOfMonth, endOfMonth);
+      List<BillableEvent> eventsThisYear = Lists.newArrayList();
 
-      for (final BillableEvent event : eventsThisMonth) {
+      for (int month = 0; month < 11; month ++) {
 
-        BillableEvent skewedEvent =
-            addEventTimeSkewAndLateness(
-                event.getTimestampMs(), event.getCustomer(), event.getAmount(), event.getType());
+        final long startOfMonth = startOfYear + month * DAYS.toMillis(30);
+        final long endOfMonth = startOfMonth + DAYS.toMillis(30);
+
+        eventsThisYear.addAll(getEventsForMonth(startOfMonth, endOfMonth));
+      }
+
+      eventsThisYear.sort((o1, o2) -> (int) Math.signum(o1.getTimestampMs() - o2.getTimestampMs()));
+      addEventTimeSkewAndLateness(eventsThisYear);
+
+      for (final BillableEvent event : eventsThisYear) {
 
         producer.send(
-            new ProducerRecord<>(Constants.SRC_KAFKA_TOPIC, "" + random.nextInt(), format(event)));
+                new ProducerRecord<>(Constants.SRC_KAFKA_TOPIC, String.valueOf(random.nextInt()), format(event)));
 
         maybeLog(event);
 
-        Thread.sleep(DELAY_PER_MONTH / eventsThisMonth.size());
+        Thread.sleep(DELAY_PER_MONTH * 12 / eventsThisYear.size());
+
       }
 
-      month++;
+      year++;
     }
   }
 
-  private static BillableEvent addEventTimeSkewAndLateness(
-      final long originalTimestamp,
-      final String customer,
-      final Money amount,
-      final BillableEventType type) {
+  private static void addEventTimeSkewAndLateness(final List<BillableEvent> events) {
 
-    long outOfOrderTimestamp =
-        originalTimestamp + ThreadLocalRandom.current().nextLong(0, MAX_OUT_OF_ORDERNESS);
+    for (int i = 0; i < events.size()-1; i = i +2) {
 
-    return new BillableEvent(outOfOrderTimestamp, customer, amount, type);
+      long lowTimestamp = events.get(i).getTimestampMs();
+      long highTimestamp = events.get(i + 1).getTimestampMs();
+
+      if (lowTimestamp + MAX_OUT_OF_ORDERNESS > highTimestamp && random.nextFloat() < OUT_OF_ORDERNESS_COEFFICIENT) {
+        Collections.swap(events, i, i + 1);
+      } else if (lowTimestamp + MAX_LATENESS > highTimestamp && random.nextFloat() < LATENESS_COEFFICIENT) {
+        Collections.swap(events, i, i + 1);
+      }
+
+    }
   }
 
   private static void maybeLog(final BillableEvent event) {
-    if (random.nextFloat() < 0.1) {
+    if (random.nextFloat() < 1) {
       LOGGER.debug(
           "{}, {}, {}, {}",
           new DateTime(event.getTimestampMs()).toString(timeFormatter),
-          event.getCustomer(),
+              event.getCustomer(),
           moneyFormatter.print(event.getAmount()),
-          event.getType());
+              event.getType()
+          );
     }
   }
 
-  private static List<BillableEvent> getSortedEventsForMonth(
+  private static List<BillableEvent> getEventsForMonth(
       final long beginningOfMonth, final long endOfMonth) {
     List<BillableEvent> monthlyEvents = Lists.newArrayList();
 
@@ -136,13 +151,12 @@ public class BillableEventGenerator {
       }
     }
 
-    monthlyEvents.sort((o1, o2) -> (int) Math.signum(o1.getTimestampMs() - o2.getTimestampMs()));
     return monthlyEvents;
   }
 
   private static long randomTime(final long beginningOfMonth, final long endOfMonth) {
     return ThreadLocalRandom.current()
-        .nextLong(beginningOfMonth, endOfMonth - MAX_OUT_OF_ORDERNESS);
+        .nextLong(beginningOfMonth, endOfMonth);
   }
 
   private static BillableEventType randomType() {
@@ -172,7 +186,7 @@ public class BillableEventGenerator {
     int sum = 0;
     for (int i = 0; i < count - 1; i++) {
       if (sum < finalSum - 2) {
-        final int amount = random.nextInt((finalSum - sum) / 2) + 1;
+        final int amount = random.nextInt((finalSum - sum) / 10 + 1) + 1;
         partition.add(amount);
         sum += amount;
       }

@@ -9,6 +9,7 @@ import org.apache.flink.util.Collector;
 import org.joda.money.Money;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 class MonthlySubTotalPreviewFunction
     extends RichWindowFunction<Money, MonthlySubtotalByCategory, String, TimeWindow> {
@@ -44,7 +45,7 @@ class MonthlySubTotalPreviewFunction
       final Collector<MonthlySubtotalByCategory> out)
       throws Exception {
     Money amount = input.iterator().next();
-    String month = String.valueOf(window.getStart());
+    String month = String.valueOf(window.getStart() + TimeUnit.DAYS.toMillis(15));
 
     MonthlySubtotalByCategory monthlySubtotal =
         new MonthlySubtotalByCategory(customer, month, amount);

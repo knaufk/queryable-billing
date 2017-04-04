@@ -34,11 +34,11 @@ public class QueryableBillingJob {
   private static final Time ONE_MONTH = Time.days(30);
 
   QueryableBillingJob(
-      final StreamExecutionEnvironment executionEnvironment, ParameterTool parameters) {
+      final StreamExecutionEnvironment env, ParameterTool parameters) {
     this.parameters = parameters;
-    env = executionEnvironment;
-    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-    env.enableCheckpointing(10000);
+    this.env = env;
+    this.env.enableCheckpointing(10_000);
+    this.env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
   }
 
   public static void main(String[] args) throws Exception {
