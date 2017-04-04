@@ -33,8 +33,7 @@ public class QueryableBillingJob {
 
   private static final Time ONE_MONTH = Time.days(30);
 
-  QueryableBillingJob(
-      final StreamExecutionEnvironment env, ParameterTool parameters) {
+  QueryableBillingJob(final StreamExecutionEnvironment env, ParameterTool parameters) {
     this.parameters = parameters;
     this.env = env;
     this.env.enableCheckpointing(10_000);

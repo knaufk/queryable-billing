@@ -10,8 +10,7 @@ public class MonthlySubtotalByCategory {
   private final String category;
   private final String month;
   private final Money total;
-  private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM");
-  ;
+  private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM");;
 
   public MonthlySubtotalByCategory(final String category, String month, final Money total) {
     this.category = category;

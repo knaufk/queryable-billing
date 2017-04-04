@@ -60,11 +60,13 @@ public class BillableEventGenerator {
   private static DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("YYYY-MM-dd HH:mm");
   private static MoneyFormatter moneyFormatter =
       new MoneyFormatterBuilder().appendAmount(ASCII_DECIMAL_POINT_NO_GROUPING).toFormatter();
-  public static final List<BillableEventType> BILLABLE_EVENT_TYPES = Lists.newArrayList(BillableEventType.values());
+
+  private static final List<BillableEventType> BILLABLE_EVENT_TYPES =
+      Lists.newArrayList(BillableEventType.values());
 
   public static void main(String[] args) throws InterruptedException {
 
-   final String bootstrapServers = args[0];
+    final String bootstrapServers = args[0];
 
     final Producer<String, String> producer = createKafkaProducer(bootstrapServers);
 
@@ -75,7 +77,7 @@ public class BillableEventGenerator {
 
       List<BillableEvent> eventsThisYear = Lists.newArrayList();
 
-      for (int month = 0; month < 11; month ++) {
+      for (int month = 0; month < 11; month++) {
 
         final long startOfMonth = startOfYear + month * DAYS.toMillis(30);
         final long endOfMonth = startOfMonth + DAYS.toMillis(30);
@@ -89,12 +91,12 @@ public class BillableEventGenerator {
       for (final BillableEvent event : eventsThisYear) {
 
         producer.send(
-                new ProducerRecord<>(Constants.SRC_KAFKA_TOPIC, String.valueOf(random.nextInt()), format(event)));
+            new ProducerRecord<>(
+                Constants.SRC_KAFKA_TOPIC, String.valueOf(random.nextInt()), format(event)));
 
         maybeLog(event);
 
         Thread.sleep(DELAY_PER_MONTH * 12 / eventsThisYear.size());
-
       }
 
       year++;
@@ -103,29 +105,29 @@ public class BillableEventGenerator {
 
   private static void addEventTimeSkewAndLateness(final List<BillableEvent> events) {
 
-    for (int i = 0; i < events.size()-1; i = i +2) {
+    for (int i = 0; i < events.size() - 1; i = i + 2) {
 
       long lowTimestamp = events.get(i).getTimestampMs();
       long highTimestamp = events.get(i + 1).getTimestampMs();
 
-      if (lowTimestamp + MAX_OUT_OF_ORDERNESS > highTimestamp && random.nextFloat() < OUT_OF_ORDERNESS_COEFFICIENT) {
+      if (lowTimestamp + MAX_OUT_OF_ORDERNESS > highTimestamp
+          && random.nextFloat() < OUT_OF_ORDERNESS_COEFFICIENT) {
         Collections.swap(events, i, i + 1);
-      } else if (lowTimestamp + MAX_LATENESS > highTimestamp && random.nextFloat() < LATENESS_COEFFICIENT) {
+      } else if (lowTimestamp + MAX_LATENESS > highTimestamp
+          && random.nextFloat() < LATENESS_COEFFICIENT) {
         Collections.swap(events, i, i + 1);
       }
-
     }
   }
 
   private static void maybeLog(final BillableEvent event) {
-    if (random.nextFloat() < 1) {
+    if (random.nextFloat() < 0.1) {
       LOGGER.debug(
           "{}, {}, {}, {}",
           new DateTime(event.getTimestampMs()).toString(timeFormatter),
-              event.getCustomer(),
+          event.getCustomer(),
           moneyFormatter.print(event.getAmount()),
-              event.getType()
-          );
+          event.getType());
     }
   }
 
@@ -155,8 +157,7 @@ public class BillableEventGenerator {
   }
 
   private static long randomTime(final long beginningOfMonth, final long endOfMonth) {
-    return ThreadLocalRandom.current()
-        .nextLong(beginningOfMonth, endOfMonth);
+    return ThreadLocalRandom.current().nextLong(beginningOfMonth, endOfMonth);
   }
 
   private static BillableEventType randomType() {
