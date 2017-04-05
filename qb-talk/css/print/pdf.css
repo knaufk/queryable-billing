@@ -179,3 +179,7 @@ body .reveal .slides section .fragment.highlight,
 body .reveal .slides section .highlight:not(.fragment) {
    background-color: yellow;
    border-radius: 4px; }
+
+body .reveal .slides section .fragment.visible {
+	opacity: 1;
+}
