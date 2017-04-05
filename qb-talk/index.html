@@ -88,16 +88,38 @@
 --
 
 ### Evolution of Streaming Architecture
-* Lambda Architecture
-* External Key-Value Store
-* Fault-tolerant Stream Processor
+1. Lambda Architecture (Batch Layer & Speed Layer)<!-- .element: class="fragment" -->
+2. Fault-Tolerant Stream Processor + External Key-Value Store<!-- .element: class="fragment" -->
+3. Fault-Tolerant Stream Processor With Queryable State<!-- .element: class="fragment" -->
+
+--
+
+&lambda;
+
+<img src="img/evolution-lambda.svg" width="800">
+
+[[
+<!-- TODO animate if not too complicated-->
+
+--
+
+&kappa;
+
+<img src="img/evolution-kappa.svg" width="800">
+
+
+--
+
+Queryable State
+
+<img src="img/evolution-queryable-state.svg" width="800">
 
 [[
 TODO
 
 --
 
-### High Level Implementation
+### High-Level Implementation
 
 <img src="img/QueryableStateFlow.svg" width="1000">
 
@@ -115,7 +137,6 @@ TODO
 <img src="img/qb-sketch.png" width="800">
 
 [[
-
 * As the invoicing system I want to receive the total amount due at the end of each month, so that I can issue correct invoices to each customer.
 * As a postpaid customer I want to be able check my current amount due during the month so that I can adjust my usage behaviour accordingly.
 * As a marketing manager I want to know how much money my customers are currently spending on the different types of products to make real-time adjustments to my campaigns.
@@ -152,7 +173,6 @@ TODO
 <img src="img/qb-jobgraph.png" width="500" />
 
 [[
-
 * Flink Job
 * Kafka Source
 * TimeWindows
