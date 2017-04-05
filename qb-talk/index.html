@@ -83,7 +83,7 @@
 
 ---
 
-## Queryable State
+## Intro to Queryable State
 
 --
 
@@ -103,7 +103,7 @@ TODO
 
 ---
 
-## Use Case
+## Use Case: Queryable Billing
 
 --
 
@@ -111,7 +111,8 @@ TODO
 
 --
 
-![Use Case](img/qb-sketch.png "Queryable Billing")
+#### Functional
+<img src="img/qb-sketch.png" width="800">
 
 [[
 
@@ -121,7 +122,7 @@ TODO
 
 --
 
-
+#### Non-Functional
 ![Non-functional Requirements](img/nfa.svg "Non-functional Requirements")
 
 [[
@@ -136,27 +137,31 @@ TODO
 
 --
 
-### Design/Jobgraph/Connectors
-
-* Flink Job
-    * Kafka Source
-    * TimeWindows
-        * Aggregation
-        * Queryable State
-    * BucketingSink
-* Spring Boot Server
-    * QueryableStateClient
-* Frontend
-
-[[
-* TODO idea: qb-sketch here again, logos (Flink, Spring Boot, React/Redux, Kafka, HDFS) appear one after the other
-* exactly-once for invoices
+### Architecture
 
 --
 
-### Job Graph
+#### High-Level
+<img src="img/architecture.svg"/>
 
+[[
+
+--
+
+#### Flink Job
 <img src="img/qb-jobgraph.png" width="500" />
+
+[[
+
+* Flink Job
+* Kafka Source
+* TimeWindows
+* Aggregation
+* Queryable State
+* BucketingSink
+* Spring Boot Server
+* QueryableStateClient
+* Frontend
 
 ---
 
@@ -261,28 +266,26 @@ TODO
 * Improvements of client API <!-- .element: class="fragment" -->
 * Availability in case of Job failures <!-- .element: class="fragment" -->
 
+--
+
+<table class="contacts">
+    <tr>
+        <td><i class="fa fa-envelope" aria-hidden="true"></i></td>
+        <td><a href="mailto:maximilian.bode@tng.tech">maximilian.bode@tng.tech</a></td>
+        <td><i class="fa fa-envelope" aria-hidden="true"></i></td>
+        <td><a href="mailto:konstantin.knauf@tng.tech">konstantin.knauf@tng.tech</a></td>
+    </tr>
+    <tr>
+        <td><i class="fa fa-linkedin" aria-hidden="true"></i></td>
+        <td><a href="http://lnked.in/maxbode">lnked.in/maxbode</a></td>
+        <td><i class="fa fa-twitter" aria-hidden="true"></i></td>
+        <td><a href="https://twitter.com/snntrable">@snntrable</a></td>
+    </tr>
+</table>
+<br/>
+<a href="http://www.tngtech.com"><img class="logo" src="img/tng.png" width="300"></a>
 
 </script>
-                </section>
-                <section>
-                    <section>
-                        <table class="contacts">
-                            <tr>
-                                <td><i class="fa fa-envelope" aria-hidden="true"></i></td>
-                                <td><a href="mailto:maximilian.bode@tng.tech">maximilian.bode@tng.tech</a></td>
-                                <td><i class="fa fa-envelope" aria-hidden="true"></i></td>
-                                <td><a href="mailto:konstantin.knauf@tng.tech">konstantin.knauf@tng.tech</a></td>
-                            </tr>
-                            <tr>
-                                <td><i class="fa fa-linkedin" aria-hidden="true"></i></td>
-                                <td><a href="http://lnked.in/maxbode">lnked.in/maxbode</a></td>
-                                <td><i class="fa fa-twitter" aria-hidden="true"></i></td>
-                                <td><a href="https://twitter.com/snntrable">@snntrable</a></td>
-                            </tr>
-                        </table>
-                        <br/>
-                        <a href="http://www.tngtech.com"><img class="logo" src="img/tng.png" width="300"></a>
-                    </section>
                 </section>
             </div>
 

@@ -47,10 +47,10 @@ public class FlinkStateQueryService implements StateQueryService {
     return querySubTotal(type, PER_EVENT_TYPE_STATE_NAME);
   }
 
-  private MonthlySubtotalByCategory querySubTotal(
-      final String type, final String perEventTypeStateName) throws Exception {
+  private MonthlySubtotalByCategory querySubTotal(final String key, final String stateName)
+      throws Exception {
     final Future<byte[]> stateFuture =
-        client.getKvState(jobId, perEventTypeStateName, type.hashCode(), serializeKey(type));
+        client.getKvState(jobId, stateName, key.hashCode(), serializeKey(key));
     final byte[] serializedResult =
         Await.result(stateFuture, new FiniteDuration(10, TimeUnit.SECONDS));
     return deserializeValue(serializedResult);
