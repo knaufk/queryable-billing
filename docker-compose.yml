@@ -12,10 +12,10 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
-  broker1:
+  kafka:
     image: confluentinc/cp-kafka:3.2.0
-    container_name: broker1
-    hostname: broker1
+    container_name: kafka
+    hostname: kafka
     depends_on:
       - zookeeper
     ports:
@@ -23,7 +23,7 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker1:9092'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
       KAFKA_NUM_PARTITIONS: 18
 
   jobmanager1:
@@ -94,17 +94,17 @@ services:
     container_name: qb-job
     depends_on:
       - jobmanager1
-      - broker1
-    command: flink run -p 6 qb-job-0.1-SNAPSHOT-all.jar --output /var/qb/invoices --bootstrap-servers broker1:9092
+      - kafka
+    command: flink run -p 6 qb-job-0.1-SNAPSHOT-all.jar --output /var/qb/invoices --bootstrap-servers kafka:9092
 
   qb-data-generator:
     image: qb-data-generator:0.1-SNAPSHOT
     build: ./qb-data-generator/build
     container_name: qb-data-generator
     depends_on:
-      - broker1
+      - kafka
       - qb-job
-    command: java -jar qb-data-generator-0.1-SNAPSHOT-all.jar broker1:9092
+    command: java -jar qb-data-generator-0.1-SNAPSHOT-all.jar kafka:9092
 
   qb-server:
     image: qb-server:0.1-SNAPSHOT
