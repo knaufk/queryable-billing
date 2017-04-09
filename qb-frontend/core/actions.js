@@ -51,7 +51,7 @@ export function fetchSubtotal(subscriber) {
 
         dispatch(requestSubtotal(subscriber))
 
-        return fetch("http://localhost:8080/customers/" + subscriber)
+        return fetch("http://192.168.99.100:8080/customers/" + subscriber)
             .then(function(response) {
                 if (response.status >= 400 && response.status < 600) {
                     throw new Error("Bad response from server");
