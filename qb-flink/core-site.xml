@@ -1,0 +1,6 @@
+<configuration>
+    <property>
+        <name>fs.file.impl</name>
+        <value>org.apache.hadoop.fs.RawLocalFileSystem</value>
+    </property>
+</configuration>

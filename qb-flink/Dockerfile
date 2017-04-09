@@ -52,6 +52,8 @@ RUN addgroup --system flink && adduser --system --ingroup flink --home $FLINK_HO
 # Configure container
 USER flink
 ADD flink-conf.yaml $FLINK_HOME/conf
+ADD log4j.properties $FLINK_HOME/conf
+ADD core-site.xml $FLINK_HOME/conf
 ADD masters $FLINK_HOME/conf
 ADD docker-entrypoint.sh $FLINK_HOME/bin/
 USER root
