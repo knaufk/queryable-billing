@@ -24,7 +24,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
-      KAFKA_NUM_PARTITIONS: 18
+      KAFKA_NUM_PARTITIONS: 2
 
   jobmanager1:
     image: qb-flink
