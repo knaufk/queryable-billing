@@ -7,7 +7,10 @@ import org.apache.flink.streaming.api.functions.windowing.RichWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 import org.joda.money.Money;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -15,10 +18,13 @@ class MonthlySubTotalPreviewFunction
     extends RichWindowFunction<Money, MonthlySubtotalByCategory, String, TimeWindow> {
 
   private final boolean queryable;
+  private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
 
   private String stateName;
   private ValueStateDescriptor stateDescriptor;
   private ValueState<MonthlySubtotalByCategory> state;
+
+  private static final Logger LOG = LoggerFactory.getLogger(MonthlySubTotalPreviewFunction.class);
 
   MonthlySubTotalPreviewFunction(Optional<String> stateName) {
     queryable = stateName.isPresent();
@@ -45,7 +51,12 @@ class MonthlySubTotalPreviewFunction
       final Collector<MonthlySubtotalByCategory> out)
       throws Exception {
     Money amount = input.iterator().next();
-    String month = String.valueOf(window.getStart() + TimeUnit.DAYS.toMillis(15));
+    long timestamp = window.getStart() + TimeUnit.DAYS.toMillis(15);
+    String month = String.valueOf(timestamp);
+    if (!queryable) {
+      LOG.info(
+          "customer={}, month={}, amount={}", customer, simpleDateFormat.format(timestamp), amount);
+    }
 
     MonthlySubtotalByCategory monthlySubtotal =
         new MonthlySubtotalByCategory(customer, month, amount);

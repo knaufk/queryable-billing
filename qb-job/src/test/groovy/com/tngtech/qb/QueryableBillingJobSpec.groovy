@@ -68,5 +68,17 @@ class QueryableBillingJobSpec extends Specification {
                         Money.of(CurrencyUnit.EUR, it, RoundingMode.UP),
                         types.get(random.nextInt(types.size())) )
             }))
+        .assignTimestampsAndWatermarks(new TestBoundedOutOfOrdernessTimestampExtractor(Time.milliseconds(100)))
+    }
+
+    static class TestBoundedOutOfOrdernessTimestampExtractor extends BoundedOutOfOrdernessTimestampExtractor<BillableEvent> {
+        TestBoundedOutOfOrdernessTimestampExtractor(Time maxOutOfOrderness) {
+            super(maxOutOfOrderness)
+        }
+
+        @Override
+        long extractTimestamp(BillableEvent element) {
+            return element.getTimestampMs();
+        }
     }
 }

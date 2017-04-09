@@ -9,6 +9,9 @@ import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.List;
 
+import static java.math.RoundingMode.UP;
+import static org.joda.money.CurrencyUnit.EUR;
+
 public class BillableEvent {
 
   private long timestampMs;
@@ -20,6 +23,15 @@ public class BillableEvent {
     this.timestampMs = 0;
     this.customer = "";
     this.amount = Money.zero(CurrencyUnit.EUR);
+  }
+
+  static BillableEvent fromEvent(String eventString) {
+    final String[] fields = eventString.split(",");
+    return new BillableEvent(
+        Long.parseLong(fields[0]),
+        fields[1],
+        Money.of(EUR, Double.valueOf(fields[2]), UP),
+        BillableEventType.valueOf(fields[3].toUpperCase()));
   }
 
   public BillableEvent(

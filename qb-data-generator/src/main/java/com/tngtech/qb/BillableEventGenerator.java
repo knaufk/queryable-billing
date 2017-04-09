@@ -54,7 +54,6 @@ public class BillableEventGenerator {
   public static final float OUT_OF_ORDERNESS_COEFFICIENT = 0.1f;
 
   public static final long MAX_LATENESS = DAYS.toMillis(3);
-  public static final float LATENESS_COEFFICIENT = 0.1f;
 
   private static Random random = new Random();
   private static DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("YYYY-MM-dd HH:mm");
@@ -91,8 +90,7 @@ public class BillableEventGenerator {
       for (final BillableEvent event : eventsThisYear) {
 
         producer.send(
-            new ProducerRecord<>(
-                Constants.SRC_KAFKA_TOPIC, String.valueOf(random.nextInt()), format(event)));
+            new ProducerRecord<>(Constants.SRC_KAFKA_TOPIC, event.getCustomer(), format(event)));
 
         maybeLog(event);
 
@@ -106,22 +104,28 @@ public class BillableEventGenerator {
   private static void addEventTimeSkewAndLateness(final List<BillableEvent> events) {
 
     for (int i = 0; i < events.size() - 1; i = i + 2) {
-
       long lowTimestamp = events.get(i).getTimestampMs();
       long highTimestamp = events.get(i + 1).getTimestampMs();
 
       if (lowTimestamp + MAX_OUT_OF_ORDERNESS > highTimestamp
           && random.nextFloat() < OUT_OF_ORDERNESS_COEFFICIENT) {
         Collections.swap(events, i, i + 1);
-      } else if (lowTimestamp + MAX_LATENESS > highTimestamp
-          && random.nextFloat() < LATENESS_COEFFICIENT) {
-        Collections.swap(events, i, i + 1);
       }
     }
+
+    for (int i=0; i < events.size() - 50; i= i+51) {
+      long lowTimestamp = events.get(i).getTimestampMs();
+      long highTimestamp = events.get(i + 50).getTimestampMs();
+
+      if (lowTimestamp + MAX_LATENESS > highTimestamp) {
+        Collections.swap(events, i, i + 50);
+      }
+    }
+
   }
 
   private static void maybeLog(final BillableEvent event) {
-    if (random.nextFloat() < 0.1) {
+    if (random.nextFloat() < 1) {
       LOGGER.debug(
           "{}, {}, {}, {}",
           new DateTime(event.getTimestampMs()).toString(timeFormatter),

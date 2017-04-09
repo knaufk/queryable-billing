@@ -11,10 +11,6 @@ public class MonthBucketer implements Bucketer<MonthlySubtotalByCategory> {
 
   private static final long serialVersionUID = 1L;
 
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-    in.defaultReadObject();
-  }
-
   @Override
   public Path getBucketPath(
       final Clock clock, final Path basePath, final MonthlySubtotalByCategory element) {
