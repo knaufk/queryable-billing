@@ -113,7 +113,7 @@ public class BillableEventGenerator {
       }
     }
 
-    for (int i=0; i < events.size() - 50; i= i+51) {
+    for (int i = 0; i < events.size() - 50; i = i + 51) {
       long lowTimestamp = events.get(i).getTimestampMs();
       long highTimestamp = events.get(i + 50).getTimestampMs();
 
@@ -121,7 +121,6 @@ public class BillableEventGenerator {
         Collections.swap(events, i, i + 50);
       }
     }
-
   }
 
   private static void maybeLog(final BillableEvent event) {
