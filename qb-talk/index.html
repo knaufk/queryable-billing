@@ -60,9 +60,8 @@
 <img src="img/intro/konstantin.jpg" height="300" style="float:left">
 <img src="img/intro/max.jpg" height="300" style="float:right">
 
-- Background in maths & physics<!-- .element: class="fragment" -->
-- Software Consultants<!-- .element: class="fragment" -->
-- Interested in<!-- .element: class="fragment" -->
+- Software Engineers<!-- .element: class="fragment" -->
+- Focus on<!-- .element: class="fragment" -->
     - Distributed systems
     - Stream processing
 - Flink in production for 1.5 y<!-- .element: class="fragment" -->
@@ -102,6 +101,8 @@
 [[
 <!-- TODO animate if not too complicated-->
 - Lambda Architecture (Batch Layer & Speed Layer)
+- PRO: previews, low load on KV store, can be built using existing systems
+- CON: no correctness in speed layer, high complexity
 
 --
 
@@ -111,6 +112,8 @@
 
 [[
 - Fault-Tolerant Stream Processor + External Key-Value Store
+- PRO: reduce load on KV store, correctness with latency
+- CON: writes must be idempotent
 
 --
 
@@ -120,10 +123,12 @@ Queryable State
 
 [[
 - Fault-Tolerant Stream Processor With Queryable State
+- PRO: no external data store, easy to scale, simplicity, correctness
+- CON: total state size must fit in Flink state
 
 --
 
-### High-Level Implementation
+### Implementation in Flink
 
 <img src="img/queryable-state/QueryableStateFlow.svg" width="1000">
 
@@ -173,18 +178,23 @@ Queryable State
 --
 
 #### Flink Job
+<div id="left">
 <img src="img/queryable-billing/qb-jobgraph.png" width="500" />
+</div>
+
+<div id="left">
+- Events from Kafka <!-- .element: class="fragment" -->
+- Final Invoices <!-- .element: class="fragment" -->
+    - `TimeWindow` with Aggregation
+    - `BucketingSink`
+- Previews <!-- .element: class="fragment" -->
+    - `TimeWindow` with Aggregation
+    - `CountTrigger.of(1)`
+    - Queryable State in `WindowFunction`
+</div>
 
 [[
-* Flink Job
-* Kafka Source
-* TimeWindows
-* Aggregation
-* Queryable State
-* BucketingSink
-* Spring Boot Server
-* QueryableStateClient
-* Frontend
+* 150 LOC
 
 ---
 
