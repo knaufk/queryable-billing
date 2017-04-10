@@ -16,7 +16,7 @@
         <link rel="stylesheet" href="lib/css/github.css">
 
         <link rel="stylesheet" href="custom.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+        <link rel="stylesheet" href="lib/font-awesome-4.7.0/css/font-awesome.min.css">
 
 
         <!-- Printing and PDF exports -->
@@ -55,16 +55,14 @@
 
 --
 
-## Who are we?
-
 <img src="img/intro/konstantin.jpg" height="300" style="float:left">
 <img src="img/intro/max.jpg" height="300" style="float:right">
 
-- Software Engineers<!-- .element: class="fragment" -->
+- Software Engineers with<br/>TNG Technology Consulting<!-- .element: class="fragment" -->
 - Focus on<!-- .element: class="fragment" -->
-    - Distributed systems
-    - Stream processing
-- Flink in production for 1.5 y<!-- .element: class="fragment" -->
+    - Distributed Systems
+    - Real-Time Processing
+- Flink in Production for 1.5 y<!-- .element: class="fragment" -->
 
 [[
 * TNG Technology Consulting, a Munich-based consulting firm focused on high-end information technology
@@ -99,7 +97,6 @@
 <img src="img/queryable-state/evolution-lambda.svg" width="800">
 
 [[
-<!-- TODO animate if not too complicated-->
 - Lambda Architecture (Batch Layer & Speed Layer)
 - PRO: previews, low load on KV store, can be built using existing systems
 - CON: no correctness in speed layer, high complexity
@@ -114,6 +111,7 @@
 - Fault-Tolerant Stream Processor + External Key-Value Store
 - PRO: reduce load on KV store, correctness with latency
 - CON: writes must be idempotent
+<!-- TODO cache -> kv state -->
 
 --
 
@@ -130,11 +128,14 @@ Queryable State
 
 ### Implementation in Flink
 
+--
+
 <img src="img/queryable-state/QueryableStateFlow.svg" width="1000">
+<!-- TODO fix lookup service, fix component arrangement -->
 
 ---
 
-## Use Case: Queryable Billing
+## Use Case: "Queryable Billing"
 
 --
 
@@ -145,13 +146,13 @@ Queryable State
 <img src="img/queryable-billing/qb-sketch.png" width="800">
 
 [[
+<!-- TODO show user stories in some way? -->
 * As the invoicing system I want to receive the total amount due at the end of each month, so that I can issue correct invoices to each customer.
 * As a postpaid customer I want to be able check my current amount due during the month so that I can adjust my usage behaviour accordingly.
 * As a marketing manager I want to know how much money my customers are currently spending on the different types of products to make real-time adjustments to my campaigns.
 
 --
 
-#### Quality Goals
 <img src="img/queryable-billing/nfa.svg">
 
 [[
@@ -170,19 +171,17 @@ Queryable State
 
 --
 
-#### High-Level
 <img src="img/queryable-billing/architecture.svg"/>
 
 [[
 
 --
 
-#### Flink Job
 <div id="left">
 <img src="img/queryable-billing/qb-jobgraph.png" width="500" />
 </div>
 
-<div id="left">
+<div id="right">
 - Events from Kafka <!-- .element: class="fragment" -->
 - Final Invoices <!-- .element: class="fragment" -->
     - `TimeWindow` with Aggregation
@@ -309,9 +308,10 @@ Queryable State
 
 ## Limitations & Outlook
 
-* Native support for Queryable State in windows <!-- .element: class="fragment" -->
-* Improvements of client API <!-- .element: class="fragment" -->
-* Availability in case of Job failures <!-- .element: class="fragment" -->
+* Native Support for Queryable State in Windows <!-- .element: class="fragment" -->
+* Improvements of Client API <!-- .element: class="fragment" -->
+* Availability In Case of Job failures <!-- .element: class="fragment" -->
+* State Size <!-- .element: class="fragment" -->
 
 [[
 Extends to other use cases
