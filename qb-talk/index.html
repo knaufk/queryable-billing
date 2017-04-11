@@ -111,7 +111,6 @@
 - Fault-Tolerant Stream Processor + External Key-Value Store
 - PRO: reduce load on KV store, correctness with latency
 - CON: writes must be idempotent
-<!-- TODO cache -> kv state -->
 
 --
 
@@ -131,7 +130,6 @@ Queryable State
 --
 
 <img src="img/queryable-state/flink-implementation.svg" width="1000">
-<!-- TODO fix lookup service, fix component arrangement -->
 
 ---
 
@@ -184,10 +182,10 @@ Queryable State
 <div id="right">
 - Events from Kafka <!-- .element: class="fragment" -->
 - Final Invoices <!-- .element: class="fragment" -->
-    - `TimeWindow` with Aggregation
+    - `TimeWindow` with `FoldFunction`
     - `BucketingSink`
 - Previews <!-- .element: class="fragment" -->
-    - `TimeWindow` with Aggregation
+    - `TimeWindow` with `FoldFunction`
     - `CountTrigger.of(1)`
     - Queryable State in `WindowFunction`
 </div>
@@ -201,17 +199,18 @@ Queryable State
 
 --
 
-| Requirement   ||
-| ------------- ||
-| Invoices      ||
-| Live Updates  ||
-| Correctness   ||
-| Availability  ||
-| Scalability   ||
-| Robustness    |Late Events|
-|               |Taskmanager|
-|               |Jobmanager |
-|               |Sink       |
+### Requirements
+
+- Invoices <!-- .element: class="fragment" data-fragment-index="0" -->
+- Live Updates <!-- .element: class="fragment" data-fragment-index="0" -->
+- Correctness <!-- .element: class="fragment" data-fragment-index="1" -->
+- Availability <!-- .element: class="fragment" data-fragment-index="1" -->
+- (Scalability) <!-- .element: class="fragment" data-fragment-index="1" -->
+- Robustness <!-- .element: class="fragment" data-fragment-index="2" -->
+    - Late Events
+    - TaskManager
+    - JobManager
+    - Sink
 
 --
 
@@ -225,10 +224,9 @@ Queryable State
 | Live Updates  || |
 | Correctness   ||  <span class="new">(<i class="fa fa-check" aria-hidden="true"></i>)</span>  |
 | Availability  || |
-| Scalability   || -|
 | Robustness    |Late Events|  <i class="fa fa-check new" aria-hidden="true"></i> |
-|               |Taskmanager| |
-|               |Jobmanager | |
+|               |TaskManager| |
+|               |JobManager | |
 |               |Sink       | |
 
 
@@ -244,15 +242,14 @@ Queryable State
 | Live Updates  ||  <i class="fa fa-check new" aria-hidden="true"></i>|
 | Correctness   ||  (<i class="fa fa-check" aria-hidden="true"></i>)|
 | Availability  || |
-| Scalability   || -|
 | Robustness    |Late Events|  <i class="fa fa-check" aria-hidden="true"></i> |
-|               |Taskmanager| |
-|               |Jobmanager | |
+|               |TaskManager| |
+|               |JobManager | |
 |               |Sink       | |
 
 --
 
-### Taskmanager Failure
+### TaskManager Failure
 
 --
 
@@ -262,15 +259,14 @@ Queryable State
 | Live Updates  ||  <i class="fa fa-check" aria-hidden="true"></i>|
 | Correctness   ||  (<i class="fa fa-check" aria-hidden="true"></i>)|
 | Availability  || <span class="new">(<i class="fa fa-check new" aria-hidden="true"></i>)</span>|
-| Scalability   || -|
 | Robustness    |Late Events| <i class="fa fa-check" aria-hidden="true"></i> |
-|               |Taskmanager| <i class="fa fa-check new" aria-hidden="true"></i> |
-|               |Jobmanager | |
+|               |TaskManager| <i class="fa fa-check new" aria-hidden="true"></i> |
+|               |JobManager | |
 |               |Sink       | |
 
 --
 
-### Jobmanager Failure
+### JobManager Failure
 
 --
 
@@ -280,10 +276,9 @@ Queryable State
 | Live Updates  ||  <i class="fa fa-check" aria-hidden="true"></i>|
 | Correctness   ||  (<i class="fa fa-check" aria-hidden="true"></i>)|
 | Availability  || (<i class="fa fa-check" aria-hidden="true"></i>)|
-| Scalability   || -|
 | Robustness    |Late Events| <i class="fa fa-check" aria-hidden="true"></i> |
-|               |Taskmanager| <i class="fa fa-check" aria-hidden="true"></i> |
-|               |Jobmanager | <i class="fa fa-check new" aria-hidden="true"></i> |
+|               |TaskManager| <i class="fa fa-check" aria-hidden="true"></i> |
+|               |JobManager | <i class="fa fa-check new" aria-hidden="true"></i> |
 |               |Sink       | |
 
 --
@@ -298,25 +293,27 @@ Queryable State
 | Live Updates  ||  <i class="fa fa-check" aria-hidden="true"></i>|
 | Correctness   ||  <i class="fa fa-check new" aria-hidden="true"></i>|
 | Availability  || <span class="new">(</span>(<i class="fa fa-check" aria-hidden="true"></i>)<span class="new">)</span>|
-| Scalability   || -|
 | Robustness    |Late Events| <i class="fa fa-check" aria-hidden="true"></i> |
-|               |Taskmanager| <i class="fa fa-check" aria-hidden="true"></i> |
-|               |Jobmanager | <i class="fa fa-check" aria-hidden="true"></i> |
+|               |TaskManager| <i class="fa fa-check" aria-hidden="true"></i> |
+|               |JobManager | <i class="fa fa-check" aria-hidden="true"></i> |
 |               |Sink       | <i class="fa fa-check new" aria-hidden="true"></i> |
 
 ---
 
-## Limitations & Outlook
+## Current Limitations
 
 * Native Support for Queryable State in Windows <!-- .element: class="fragment" -->
 * Improvements of Client API <!-- .element: class="fragment" -->
-* Availability In Case of Job failures <!-- .element: class="fragment" -->
 * State Size <!-- .element: class="fragment" -->
+* Availability in Case of Job Failures <!-- .element: class="fragment" -->
 
 [[
-Extends to other use cases
 
 --
+
+## Questions?
+
+&nbsp;
 
 <table class="contacts">
     <tr>
