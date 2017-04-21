@@ -10,6 +10,8 @@ The project consists of the following components
 * **qb-data-generator:** A data generator producing billable events to a Kafka Queue.
 * **qb-frontend:** A small React/Redux application, which provides customers a web application to check there current monthly sub-total.
 
+[![Build Status](https://travis-ci.org/mbode/queryable-billing.svg?branch=master)](https://travis-ci.org/mbode/queryable-billing)
+
 Build
 -----
 First of all, you need Flink, Kafka and Zookeeper containers. The latter two are on DockerHub. To build the Flink container run the following command in the *qb-flink* sub-folder
