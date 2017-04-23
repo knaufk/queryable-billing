@@ -55,22 +55,6 @@
 
 --
 
-<img src="img/intro/konstantin.jpg" height="300" style="float:left">
-<img src="img/intro/max.jpg" height="300" style="float:right">
-
-- Software Engineers with<br/>TNG Technology Consulting<!-- .element: class="fragment" -->
-- Focus on<!-- .element: class="fragment" -->
-    - Distributed Systems
-    - Real-Time Processing
-- Flink in Production for 1.5 y<!-- .element: class="fragment" -->
-
-[[
-* TNG Technology Consulting, a Munich-based consulting firm focused on high-end information technology
-* both currently on a project with one of Europe’s largest telecommunications providers
-* built a platform processing billions of events per day
-
---
-
 ### Agenda
 
 1. Intro to Queryable State <!-- .element: class="fragment" -->
@@ -88,48 +72,72 @@
 
 --
 
-### Evolution of Streaming Architecture
+### Stateful Stream Processing
 
---
-
-&lambda;
-
-<img src="img/queryable-state/evolution-lambda.svg" width="800">
+#### <i>f: (in, state) -> (out, state')</i> <!-- .element: class="fragment" -->
 
 [[
-- Lambda Architecture (Batch Layer & Speed Layer)
-- PRO: previews, low load on KV store, can be built using existing systems
-- CON: no correctness in speed layer, high complexity
+Basically meaninungfull pipeline is statefull: aggregates, offsets, models,...
 
 --
 
-&kappa;
+#### Example: Simple Counter
 
-<img src="img/queryable-state/evolution-kappa.svg" width="800">
+```java
+public class Counter extends RichFlatMapFunction<Tuple2<Long, Long>, Tuple2<Long, Long>> {
 
-[[
-- Fault-Tolerant Stream Processor + External Key-Value Store
-- PRO: reduce load on KV store, correctness with latency
-- CON: writes must be idempotent
+    private transient ValueState<Long> sum;
+
+    @Override
+    public void open(Configuration config) {
+        ValueStateDescriptor descriptor = new ValueStateDescriptor<>("sum", Long.class);
+        sum = getRuntimeContext().getState(descriptor);
+    }
+
+    @Override
+    public void flatMap(Tuple2<Long, Long> input, Collector<Tuple2<Long, Long>> out) throws Exception {
+        Long currentSum = sum.value();
+
+        currentSum += input.f1;
+
+        sum.update(currentSum);
+
+        out.collect(new Tuple2<>(input.f0, currentSum);
+    }
+
+}
+```
 
 --
 
-Queryable State
-
-<img src="img/queryable-state/evolution-queryable-state.svg" width="800">
-
-[[
-- Fault-Tolerant Stream Processor With Queryable State
-- PRO: no external data store, easy to scale, simplicity, correctness
-- CON: total state size must fit in Flink state
+### Queryable State
 
 --
 
-### Implementation in Flink
+<img src="img/queryable-state/evolution-kappa.svg" width="1000">
+<img src="img/queryable-state/evolution-queryable-state.svg" width="1000">  <!-- .element: class="fragment" -->
+
 
 --
 
-<img src="img/queryable-state/flink-implementation.svg" width="1000">
+```java
+    public class Counter extends RichFlatMapFunction<Tuple2<Long, Long>, Tuple2<Long, Long>> {
+
+    private transient ValueState<Long> sum;
+
+        @Override
+        public void open(Configuration config) {
+        ValueStateDescriptor descriptor = new ValueStateDescriptor<>("sum", Long.class);
+        stateDescriptor.setQueryable("sum");
+        sum = getRuntimeContext().getState(descriptor);
+        }
+
+        @Override
+        public void flatMap(Tuple2<Long, Long> input, Collector<Tuple2<Long, Long>> out) throws Exception {
+            // update state and emit
+        }
+    }
+```
 
 ---
 
@@ -143,35 +151,13 @@ Queryable State
 
 <img src="img/queryable-billing/qb-sketch.png" width="800">
 
-[[
-<!-- TODO show user stories in some way? -->
-* As the invoicing system I want to receive the total amount due at the end of each month, so that I can issue correct invoices to each customer.
-* As a postpaid customer I want to be able check my current amount due during the month so that I can adjust my usage behaviour accordingly.
-* As a marketing manager I want to know how much money my customers are currently spending on the different types of products to make real-time adjustments to my campaigns.
-
 --
 
-<img src="img/queryable-billing/quality-goals.svg">
-
-[[
-* Completeness & Correctness
-* Scalability
-* Availability
-* Robustness
-    * Out-of-Order-Events
-    * Late Arriving Events
-    * Variable Volume
-    * Partial Failures
-
---
-
-### Architecture
+### Design & Implementation
 
 --
 
 <img src="img/queryable-billing/architecture.svg"/>
-
-[[
 
 --
 
@@ -329,11 +315,35 @@ Queryable State
         <td><a href="https://twitter.com/snntrable">@snntrable</a></td>
     </tr>
 </table>
+<table class="contacts">
+    <tr>
+        <td colspan="2" align="center">Slides & Code</td>
+    </tr>
+    <tr>
+        <td><i class="fa fa-github" aria-hidden="true"></i></td>
+        <td><a href="https://github.com/knaufk/queryable-billing">knaufk/queryable-billing</a></td>
+    </tr>
+</table>
 <br/>
 <a href="http://www.tngtech.com"><img class="logo" src="img/tng.png" width="300"></a>
 
+
+---
+
+## Backup
+
+
+--
+
+### Implementation in Flink
+
+--
+
+<img src="img/queryable-state/flink-implementation.svg" width="1000">
+
+
 </script>
-                </section>
+    </section>
             </div>
 
             </div>
