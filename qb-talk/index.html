@@ -72,72 +72,26 @@
 
 --
 
-### Stateful Stream Processing
+### <i>f: (in) -> (out)</i>
+* Map
+* Filter
 
-#### <i>f: (in, state) -> (out, state')</i> <!-- .element: class="fragment" -->
+--
+
+### <i>f: (in, state) -> (out, state')</i>
+* Window Content
+* Aggregates
+* Models
+* Offsets
 
 [[
 Basically meaninungfull pipeline is statefull: aggregates, offsets, models,...
 
 --
 
-#### Example: Simple Counter
-
-```java
-public class Counter extends RichFlatMapFunction<Tuple2<Long, Long>, Tuple2<Long, Long>> {
-
-    private transient ValueState<Long> sum;
-
-    @Override
-    public void open(Configuration config) {
-        ValueStateDescriptor descriptor = new ValueStateDescriptor<>("sum", Long.class);
-        sum = getRuntimeContext().getState(descriptor);
-    }
-
-    @Override
-    public void flatMap(Tuple2<Long, Long> input, Collector<Tuple2<Long, Long>> out) throws Exception {
-        Long currentSum = sum.value();
-
-        currentSum += input.f1;
-
-        sum.update(currentSum);
-
-        out.collect(new Tuple2<>(input.f0, currentSum);
-    }
-
-}
-```
-
---
-
-### Queryable State
-
---
-
 <img src="img/queryable-state/evolution-kappa.svg" width="1000">
 <img src="img/queryable-state/evolution-queryable-state.svg" width="1000">  <!-- .element: class="fragment" -->
 
-
---
-
-```java
-    public class Counter extends RichFlatMapFunction<Tuple2<Long, Long>, Tuple2<Long, Long>> {
-
-    private transient ValueState<Long> sum;
-
-        @Override
-        public void open(Configuration config) {
-        ValueStateDescriptor descriptor = new ValueStateDescriptor<>("sum", Long.class);
-        stateDescriptor.setQueryable("sum");
-        sum = getRuntimeContext().getState(descriptor);
-        }
-
-        @Override
-        public void flatMap(Tuple2<Long, Long> input, Collector<Tuple2<Long, Long>> out) throws Exception {
-            // update state and emit
-        }
-    }
-```
 
 ---
 
@@ -286,17 +240,6 @@ public class Counter extends RichFlatMapFunction<Tuple2<Long, Long>, Tuple2<Long
 
 ---
 
-## Current Limitations
-
-* Native Support for Queryable State in Windows <!-- .element: class="fragment" -->
-* Improvements of Client API <!-- .element: class="fragment" -->
-* State Size <!-- .element: class="fragment" -->
-* Availability in Case of Job Failures <!-- .element: class="fragment" -->
-
-[[
-
---
-
 ## Questions?
 
 &nbsp;
@@ -332,6 +275,66 @@ public class Counter extends RichFlatMapFunction<Tuple2<Long, Long>, Tuple2<Long
 
 ## Backup
 
+--
+
+#### Example: Simple Counter
+
+```java
+public class Counter extends RichFlatMapFunction<Tuple2<Long, Long>, Tuple2<Long, Long>> {
+
+private transient ValueState<Long> sum;
+
+    @Override
+    public void open(Configuration config) {
+    ValueStateDescriptor descriptor = new ValueStateDescriptor<>("sum", Long.class);
+    sum = getRuntimeContext().getState(descriptor);
+    }
+
+    @Override
+    public void flatMap(Tuple2<Long, Long> input, Collector<Tuple2<Long, Long>> out) throws Exception {
+    Long currentSum = sum.value();
+
+    currentSum += input.f1;
+
+    sum.update(currentSum);
+
+    out.collect(new Tuple2<>(input.f0, currentSum);
+    }
+
+    }
+```
+
+--
+
+```java
+public class Counter extends RichFlatMapFunction<Tuple2<Long, Long>, Tuple2<Long, Long>> {
+
+private transient ValueState<Long> sum;
+
+    @Override
+    public void open(Configuration config) {
+    ValueStateDescriptor descriptor = new ValueStateDescriptor<>("sum", Long.class);
+    stateDescriptor.setQueryable("sum");
+    sum = getRuntimeContext().getState(descriptor);
+    }
+
+    @Override
+    public void flatMap(Tuple2<Long, Long> input, Collector<Tuple2<Long, Long>> out) throws Exception {
+    // update state and emit
+    }
+    }
+```
+
+--
+
+## Current Limitations
+
+* Native Support for Queryable State in Windows <!-- .element: class="fragment" -->
+* Improvements of Client API <!-- .element: class="fragment" -->
+* State Size <!-- .element: class="fragment" -->
+* Availability in Case of Job Failures <!-- .element: class="fragment" -->
+
+[[
 
 --
 
