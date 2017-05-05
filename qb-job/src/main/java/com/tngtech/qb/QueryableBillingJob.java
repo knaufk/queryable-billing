@@ -17,7 +17,6 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.joda.money.Money;
 
-import java.util.Optional;
 import java.util.Properties;
 
 import static com.tngtech.qb.Constants.PER_CUSTOMER_STATE_NAME;
@@ -85,7 +84,7 @@ public class QueryableBillingJob {
   }
 
   private void outputFinalInvoice(final DataStream<BillableEvent> billableEvents) {
-    sumUp(monthlyWindows(billableEvents, BillableEvent::getCustomer), Optional.empty(), "Customer")
+    sumUp(monthlyWindows(billableEvents, BillableEvent::getCustomer), "Customer", false)
         .addSink(
             new BucketingSink<MonthlySubtotalByCategory>(parameters.getRequired("output"))
                 .setBucketer(new MonthBucketer())
@@ -97,14 +96,19 @@ public class QueryableBillingJob {
   private void exposeQueryableCustomerPreviews(final DataStream<BillableEvent> billableEvents) {
     final WindowedStream<BillableEvent, String, TimeWindow> eventsSoFar =
         monthlyWindows(billableEvents, BillableEvent::getCustomer).trigger(CountTrigger.of(1));
-    sumUp(eventsSoFar, Optional.of(PER_CUSTOMER_STATE_NAME), "Customer");
+    sumUpQueryably(eventsSoFar, PER_CUSTOMER_STATE_NAME);
   }
 
   private void exposeQueryableTypePreviews(final DataStream<BillableEvent> billableEvents) {
     final WindowedStream<BillableEvent, String, TimeWindow> eventsSoFar =
         monthlyWindows(billableEvents, event -> event.getType().toString())
             .trigger(CountTrigger.of(1));
-    sumUp(eventsSoFar, Optional.of(PER_EVENT_TYPE_STATE_NAME), "EventType");
+    sumUpQueryably(eventsSoFar, PER_EVENT_TYPE_STATE_NAME);
+  }
+
+  private void sumUpQueryably(
+      final WindowedStream<BillableEvent, String, TimeWindow> eventsSoFar, final String stateName) {
+    sumUp(eventsSoFar, stateName, true);
   }
 
   private WindowedStream<BillableEvent, String, TimeWindow> monthlyWindows(
@@ -117,13 +121,17 @@ public class QueryableBillingJob {
 
   private DataStream<MonthlySubtotalByCategory> sumUp(
       WindowedStream<BillableEvent, String, TimeWindow> windowed,
-      Optional<String> stateName,
-      String categoryName) {
+      String categoryName,
+      final boolean queryable) {
+    final MonthlySubTotalPreviewFunction windowFunction = new MonthlySubTotalPreviewFunction();
+    if (queryable) {
+      windowFunction.makeStateQueryable(categoryName);
+    }
     return windowed
         .fold(
             Money.zero(EUR),
             (accumulator, value) -> accumulator.plus(value.getAmount()),
-            new MonthlySubTotalPreviewFunction(stateName))
+            windowFunction)
         .name("Individual Sums for each " + categoryName + " per Payment Period");
   }
 
