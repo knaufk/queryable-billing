@@ -12,6 +12,15 @@ The project consists of the following components
 
 [![Build Status](https://travis-ci.org/mbode/queryable-billing.svg?branch=master)](https://travis-ci.org/mbode/queryable-billing)
 
+Talk
+----
+### Upcoming
+- [Berlin Buzzwords 2017](https://berlinbuzzwords.de/17/session/queryable-state-or-how-build-billing-system-without-database)
+
+### Past
+- [Flink Forward San Francisco](http://sf.flink-forward.org/kb_sessions/queryable-state-or-how-to-build-a-billing-system-without-a-database/) \[ [YouTube](https://www.youtube.com/watch?v=cZbnNzKSBb0) | [Slides](http://sf.flink-forward.org/wp-content/uploads/2017/02/Flink-Forward-SF-2017_Konstantin-Knauf_Maximilian-Bode_Queryable-State-Or-How-To-Build-A-Billing-System-WIthout-A-Database.pdf) \]
+- [Apache Flink Meetup Munich](https://www.meetup.com/de-DE/Apache-Flink-Meetup-Munich/events/237883833/) / [Big Data Stream Analytics](https://www.meetup.com/de-DE/Big-Data-Stream-Analytics/events/238081597/)
+
 Build
 -----
 First of all, you need Flink, Kafka and Zookeeper containers. The latter two are on DockerHub. To build the Flink container run the following command in the *qb-flink* sub-folder
@@ -28,6 +37,7 @@ All of the above components run in their own Docker containers. To build the ima
 
 In *qb-frontend* sub-folder: 
 ```
+npm install
 node run build
 docker build . -t qb-frontend
 ```
