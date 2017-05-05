@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.tngtech.qb.BillableEvent.BillableEventType;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -23,16 +24,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static org.joda.money.CurrencyUnit.*;
 import static org.joda.money.format.MoneyAmountStyle.ASCII_DECIMAL_POINT_NO_GROUPING;
 
+@Slf4j
 public class BillableEventGenerator {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(BillableEventGenerator.class);
 
   private static final Map<String, Integer> CUSTOMERS =
       ImmutableMap.<String, Integer>builder()
@@ -50,10 +49,10 @@ public class BillableEventGenerator {
   private static final int DELAY_PER_MONTH = 30_000;
   private static final int EVENTS_PER_CUSTOMER_AND_MONTH = 10_000;
 
-  public static final long MAX_OUT_OF_ORDERNESS = HOURS.toMillis(12);
-  public static final float OUT_OF_ORDERNESS_COEFFICIENT = 0.1f;
+  private static final long MAX_OUT_OF_ORDERNESS = HOURS.toMillis(12);
+  private static final float OUT_OF_ORDERNESS_COEFFICIENT = 0.1f;
 
-  public static final long MAX_LATENESS = DAYS.toMillis(3);
+  private static final long MAX_LATENESS = DAYS.toMillis(3);
 
   private static Random random = new Random();
   private static DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("YYYY-MM-dd HH:mm");
@@ -125,7 +124,7 @@ public class BillableEventGenerator {
 
   private static void maybeLog(final BillableEvent event) {
     if (random.nextFloat() < 1) {
-      LOGGER.debug(
+      log.debug(
           "{}, {}, {}, {}",
           new DateTime(event.getTimestampMs()).toString(timeFormatter),
           event.getCustomer(),
