@@ -1,5 +1,6 @@
 package com.tngtech.qb;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
@@ -16,10 +17,11 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@NoArgsConstructor
 class MonthlySubTotalPreviewFunction
     extends RichWindowFunction<Money, MonthlySubtotalByCategory, String, TimeWindow> {
 
-  private final boolean queryable;
+  private boolean queryable = false;
   private final SimpleDateFormat simpleDateFormat =
       new SimpleDateFormat(Constants.YEAR_MONTH_PATTERN);
 
@@ -27,12 +29,10 @@ class MonthlySubTotalPreviewFunction
   private ValueStateDescriptor stateDescriptor;
   private ValueState<MonthlySubtotalByCategory> state;
 
-  MonthlySubTotalPreviewFunction(Optional<String> stateName) {
-    queryable = stateName.isPresent();
-    if (queryable) {
-      this.stateName = stateName.get();
-      stateDescriptor = new ValueStateDescriptor<>(this.stateName, MonthlySubtotalByCategory.class);
-    }
+  void makeStateQueryable(final String stateName) {
+    queryable = true;
+    this.stateName = stateName;
+    stateDescriptor = new ValueStateDescriptor<>(this.stateName, MonthlySubtotalByCategory.class);
   }
 
   @Override
