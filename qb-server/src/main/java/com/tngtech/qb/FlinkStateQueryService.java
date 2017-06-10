@@ -5,7 +5,10 @@ import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeutils.TypeSerializer;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.GlobalConfiguration;
+import org.apache.flink.runtime.highavailability.HighAvailabilityServices;
+import org.apache.flink.runtime.highavailability.HighAvailabilityServicesUtils;
 import org.apache.flink.runtime.query.QueryableStateClient;
 import org.apache.flink.runtime.query.netty.message.KvStateRequestSerializer;
 import org.apache.flink.runtime.state.VoidNamespace;
@@ -18,6 +21,7 @@ import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static com.tngtech.qb.Constants.PER_CUSTOMER_STATE_NAME;
@@ -34,7 +38,13 @@ public class FlinkStateQueryService implements StateQueryService {
       @Value("${flink.configDir}") String flinkConfigDir)
       throws Exception {
     jobId = JobID.fromHexString(jobIdHex);
-    client = new QueryableStateClient(GlobalConfiguration.loadConfiguration(flinkConfigDir));
+    final Configuration config = GlobalConfiguration.loadConfiguration(flinkConfigDir);
+    final HighAvailabilityServices highAvailabilityServices =
+        HighAvailabilityServicesUtils.createHighAvailabilityServices(
+            config,
+            Executors.newSingleThreadScheduledExecutor(),
+            HighAvailabilityServicesUtils.AddressResolution.TRY_ADDRESS_RESOLUTION);
+    client = new QueryableStateClient(config, highAvailabilityServices);
   }
 
   @Override

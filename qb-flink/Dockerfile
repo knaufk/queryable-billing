@@ -22,7 +22,7 @@ FROM openjdk:8
 RUN apt-get update && apt-get install -y bash snappy
 
 # Configure Flink version
-ENV FLINK_VERSION=1.2.0
+ENV FLINK_VERSION=1.3.0
 ENV HADOOP_VERSION=27
 ENV SCALA_VERSION=2.11
 
